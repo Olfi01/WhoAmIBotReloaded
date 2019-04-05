@@ -10,6 +10,7 @@ namespace WhoAmIBotReloaded
     {
         static void Main(string[] args)
         {
+
         }
     }
 }

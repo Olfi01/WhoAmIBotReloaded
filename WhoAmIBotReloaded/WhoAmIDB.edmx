@@ -1,0 +1,336 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="WhoAmIDB.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="WhoAmIDBStoreContainer">
+    <EntitySet Name="Users" EntityType="WhoAmIDB.Store.Users" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Groups" EntityType="WhoAmIDB.Store.Groups" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Games" EntityType="WhoAmIDB.Store.Games" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Players" EntityType="WhoAmIDB.Store.Players" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="GameGroup" Association="WhoAmIDB.Store.GameGroup">
+      <End Role="Game" EntitySet="Games" />
+      <End Role="Group" EntitySet="Groups" />
+    </AssociationSet>
+    <AssociationSet Name="ChoseRole" Association="WhoAmIDB.Store.ChoseRole">
+      <End Role="GamePlayer" EntitySet="Players" />
+      <End Role="GamePlayer1" EntitySet="Players" />
+    </AssociationSet>
+    <AssociationSet Name="GamePlayer" Association="WhoAmIDB.Store.GamePlayer">
+      <End Role="Game" EntitySet="Games" />
+      <End Role="Player" EntitySet="Players" />
+    </AssociationSet>
+    <AssociationSet Name="PlayerUser" Association="WhoAmIDB.Store.PlayerUser">
+      <End Role="Player" EntitySet="Players" />
+      <End Role="User" EntitySet="Users" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Users">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="FirstName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="LastName" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Username" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="QuestionsAsked" Type="int" Nullable="false" DefaultValue="0" />
+    <Property Name="QuestionsAnswered" Type="int" Nullable="false" DefaultValue="0" />
+    <Property Name="DidNotKnow" Type="int" Nullable="false" DefaultValue="0" />
+    <Property Name="LanguageCode" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="IsGlobalAdmin" Type="bit" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Groups">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" Nullable="false" />
+    <Property Name="Title" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Username" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Type" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="JSONSettings" Type="nvarchar(max)" Nullable="false" DefaultValue="{}" />
+  </EntityType>
+  <EntityType Name="Games">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="State" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="TimeStarted" Type="datetimeoffset" Nullable="false" />
+    <Property Name="TimeEnded" Type="datetimeoffset" Nullable="true" />
+    <Property Name="Turns" Type="int" Nullable="false" DefaultValue="0" />
+    <Property Name="Group_Id" Type="bigint" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Players">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Role" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Placement" Type="int" Nullable="false" />
+    <Property Name="QuestionsAsked" Type="int" Nullable="false" DefaultValue="0" />
+    <Property Name="QuestionsAnswered" Type="int" Nullable="false" DefaultValue="0" />
+    <Property Name="GameId" Type="bigint" Nullable="false" />
+    <Property Name="Guessed" Type="int" Nullable="false" />
+    <Property Name="GuessedRole" Type="bit" Nullable="false" />
+    <Property Name="ChoseRoleFor_Id" Type="bigint" Nullable="false" />
+    <Property Name="User_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="GameGroup">
+    <End Role="Game" Type="WhoAmIDB.Store.Games" Multiplicity="*" />
+    <End Role="Group" Type="WhoAmIDB.Store.Groups" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Group">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Game">
+        <PropertyRef Name="Group_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ChoseRole">
+    <End Role="GamePlayer" Type="WhoAmIDB.Store.Players" Multiplicity="*" />
+    <End Role="GamePlayer1" Type="WhoAmIDB.Store.Players" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="GamePlayer1">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="GamePlayer">
+        <PropertyRef Name="ChoseRoleFor_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="GamePlayer">
+    <End Role="Game" Type="WhoAmIDB.Store.Games" Multiplicity="1" />
+    <End Role="Player" Type="WhoAmIDB.Store.Players" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Game">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Player">
+        <PropertyRef Name="GameId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="PlayerUser">
+    <End Role="Player" Type="WhoAmIDB.Store.Players" Multiplicity="*" />
+    <End Role="User" Type="WhoAmIDB.Store.Users" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Player">
+        <PropertyRef Name="User_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="WhoAmIDB" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="WhoAmIDBContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Users" EntityType="WhoAmIDB.User" />
+          <EntitySet Name="Groups" EntityType="WhoAmIDB.Group" />
+          <EntitySet Name="Games" EntityType="WhoAmIDB.Game" />
+          <AssociationSet Name="GameGroup" Association="WhoAmIDB.GameGroup">
+            <End Role="Game" EntitySet="Games" />
+            <End Role="Group" EntitySet="Groups" />
+          </AssociationSet>
+          <EntitySet Name="Players" EntityType="WhoAmIDB.Player" />
+          <AssociationSet Name="ChoseRole" Association="WhoAmIDB.ChoseRole">
+            <End Role="GamePlayer" EntitySet="Players" />
+            <End Role="GamePlayer1" EntitySet="Players" />
+          </AssociationSet>
+          <AssociationSet Name="GamePlayer" Association="WhoAmIDB.GamePlayer">
+            <End Role="Game" EntitySet="Games" />
+            <End Role="Player" EntitySet="Players" />
+          </AssociationSet>
+          <AssociationSet Name="PlayerUser" Association="WhoAmIDB.PlayerUser">
+            <End Role="Player" EntitySet="Players" />
+            <End Role="User" EntitySet="Users" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="None" />
+          <Property Name="FirstName" Type="String" Nullable="false" />
+          <Property Name="LastName" Type="String" Nullable="true" />
+          <Property Name="Username" Type="String" Nullable="true" />
+          <Property Name="QuestionsAsked" Type="Int32" Nullable="false" DefaultValue="0" />
+          <Property Name="QuestionsAnswered" Type="Int32" Nullable="false" DefaultValue="0" />
+          <Property Name="DidNotKnow" Type="Int32" Nullable="false" DefaultValue="0" />
+          <NavigationProperty Name="GamePlayers" Relationship="WhoAmIDB.PlayerUser" FromRole="User" ToRole="Player" />
+          <Property Name="LanguageCode" Type="String" Nullable="true" />
+          <Property Name="IsGlobalAdmin" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Group">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="None" />
+          <Property Name="Title" Type="String" Nullable="false" />
+          <Property Name="Username" Type="String" Nullable="true" />
+          <Property Name="Type" Type="String" Nullable="false" />
+          <NavigationProperty Name="Games" Relationship="WhoAmIDB.GameGroup" FromRole="Group" ToRole="Game" />
+          <Property Name="JSONSettings" Type="String" Nullable="false" DefaultValue="{}" />
+        </EntityType>
+        <EntityType Name="Game">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Group" Relationship="WhoAmIDB.GameGroup" FromRole="Game" ToRole="Group" />
+          <NavigationProperty Name="Players" Relationship="WhoAmIDB.GamePlayer" FromRole="Game" ToRole="Player" />
+          <Property Name="State" Type="String" Nullable="false" />
+          <Property Name="TimeStarted" Type="DateTimeOffset" Nullable="false" />
+          <Property Name="TimeEnded" Type="DateTimeOffset" Nullable="true" />
+          <Property Name="Turns" Type="Int32" Nullable="false" DefaultValue="0" />
+        </EntityType>
+        <Association Name="GameGroup">
+          <End Type="WhoAmIDB.Game" Role="Game" Multiplicity="*" />
+          <End Type="WhoAmIDB.Group" Role="Group" Multiplicity="1" />
+        </Association>
+        <EntityType Name="Player">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Role" Type="String" Nullable="false" />
+          <NavigationProperty Name="ChoseRoleFor" Relationship="WhoAmIDB.ChoseRole" FromRole="GamePlayer" ToRole="GamePlayer1" />
+          <NavigationProperty Name="RoleWasChosenBy" Relationship="WhoAmIDB.ChoseRole" FromRole="GamePlayer1" ToRole="GamePlayer" />
+          <Property Name="Placement" Type="Int32" Nullable="false" />
+          <Property Name="QuestionsAsked" Type="Int32" Nullable="false" DefaultValue="0" />
+          <Property Name="QuestionsAnswered" Type="Int32" Nullable="false" DefaultValue="0" />
+          <NavigationProperty Name="Game" Relationship="WhoAmIDB.GamePlayer" FromRole="Player" ToRole="Game" />
+          <Property Name="GameId" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="User" Relationship="WhoAmIDB.PlayerUser" FromRole="Player" ToRole="User" />
+          <Property Name="Guessed" Type="Int32" Nullable="false" />
+          <Property Name="GuessedRole" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <Association Name="ChoseRole">
+          <End Type="WhoAmIDB.Player" Role="GamePlayer" Multiplicity="1" />
+          <End Type="WhoAmIDB.Player" Role="GamePlayer1" Multiplicity="1" />
+        </Association>
+        <Association Name="GamePlayer">
+          <End Type="WhoAmIDB.Game" Role="Game" Multiplicity="1" />
+          <End Type="WhoAmIDB.Player" Role="Player" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Game">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Player">
+              <PropertyRef Name="GameId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PlayerUser">
+          <End Type="WhoAmIDB.Player" Role="Player" Multiplicity="*" />
+          <End Type="WhoAmIDB.User" Role="User" Multiplicity="1" />
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="WhoAmIDBStoreContainer" CdmEntityContainer="WhoAmIDBContainer">
+    <EntitySetMapping Name="Users">
+      <EntityTypeMapping TypeName="IsTypeOf(WhoAmIDB.User)">
+        <MappingFragment StoreEntitySet="Users">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+          <ScalarProperty Name="LastName" ColumnName="LastName" />
+          <ScalarProperty Name="Username" ColumnName="Username" />
+          <ScalarProperty Name="QuestionsAsked" ColumnName="QuestionsAsked" />
+          <ScalarProperty Name="QuestionsAnswered" ColumnName="QuestionsAnswered" />
+          <ScalarProperty Name="DidNotKnow" ColumnName="DidNotKnow" />
+          <ScalarProperty Name="LanguageCode" ColumnName="LanguageCode" />
+          <ScalarProperty Name="IsGlobalAdmin" ColumnName="IsGlobalAdmin" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Groups">
+      <EntityTypeMapping TypeName="IsTypeOf(WhoAmIDB.Group)">
+        <MappingFragment StoreEntitySet="Groups">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+          <ScalarProperty Name="Username" ColumnName="Username" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="JSONSettings" ColumnName="JSONSettings" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Games">
+      <EntityTypeMapping TypeName="IsTypeOf(WhoAmIDB.Game)">
+        <MappingFragment StoreEntitySet="Games">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="State" ColumnName="State" />
+          <ScalarProperty Name="TimeStarted" ColumnName="TimeStarted" />
+          <ScalarProperty Name="TimeEnded" ColumnName="TimeEnded" />
+          <ScalarProperty Name="Turns" ColumnName="Turns" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Players">
+      <EntityTypeMapping TypeName="IsTypeOf(WhoAmIDB.Player)">
+        <MappingFragment StoreEntitySet="Players">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Role" ColumnName="Role" />
+          <ScalarProperty Name="Placement" ColumnName="Placement" />
+          <ScalarProperty Name="QuestionsAsked" ColumnName="QuestionsAsked" />
+          <ScalarProperty Name="QuestionsAnswered" ColumnName="QuestionsAnswered" />
+          <ScalarProperty Name="GameId" ColumnName="GameId" />
+          <ScalarProperty Name="Guessed" ColumnName="Guessed" />
+          <ScalarProperty Name="GuessedRole" ColumnName="GuessedRole" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="GameGroup" TypeName="WhoAmIDB.GameGroup" StoreEntitySet="Games">
+      <EndProperty Name="Group">
+        <ScalarProperty Name="Id" ColumnName="Group_Id" />
+      </EndProperty>
+      <EndProperty Name="Game">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="ChoseRole" TypeName="WhoAmIDB.ChoseRole" StoreEntitySet="Players">
+      <EndProperty Name="GamePlayer1">
+        <ScalarProperty Name="Id" ColumnName="ChoseRoleFor_Id" />
+      </EndProperty>
+      <EndProperty Name="GamePlayer">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="PlayerUser" TypeName="WhoAmIDB.PlayerUser" StoreEntitySet="Players">
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="User_Id" />
+      </EndProperty>
+      <EndProperty Name="Player">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
