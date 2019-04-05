@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Win32;
+using System.IO;
 
 namespace WhoAmIBotReloaded.Helpers
 {
@@ -11,14 +8,42 @@ namespace WhoAmIBotReloaded.Helpers
         /// <summary>
         /// List of people allowed to run dev commands
         /// </summary>
-        public static int[] Devs = { 267376056 };
+        public static readonly int[] Devs = { 267376056 };
         /// <summary>
-        /// Base directory of the git repository. If this is empty, git will not be used to update. Assumes that git is installed and on the PATH.
+        /// Base directory of the git repository. If this is empty, git will not be used to update.
         /// </summary>
-        public static string GitDirectory = "C:\\Olfi01\\WhoAmIBotReloaded\\";
+        public static readonly string GitDirectory = "C:\\Olfi01\\WhoAmIBotReloaded\\";
         /// <summary>
-        /// The port to actively listen for pushes on. If this is 0, don't listen at all.
+        /// Path of the solution to compile
         /// </summary>
-        public static int ListenForGitPort = 4242;
+        public static readonly string SolutionPath = Path.Combine(GitDirectory, "WhoAmIBotReloaded.sln");
+        /// <summary>
+        /// Path of the executable after it has been compiled
+        /// </summary>
+        public static readonly string ExecutablePath = Path.Combine(GitDirectory, "WhoAmIBotReloaded\\bin\\Release\\WhoAmIBotReloaded.exe");
+        /// <summary>
+        /// Branch to use for updating. If this is null, git pull is called without a specific branch.
+        /// </summary>
+        public static readonly string GitBranch = null;
+        /// <summary>
+        /// Repository to pull from. If this is null, the default upstream repo will be used.
+        /// </summary>
+        public static readonly string GitRepository = null;
+        /// <summary>
+        /// The port to actively listen for pushes on. If this is null, don't listen at all.
+        /// </summary>
+#if DEBUG
+        public static readonly string ListenForGitPrefix = null;
+#else
+        public static readonly string ListenForGitPrefix = "http://185.249.197.95:4242/whoAmIGit/";
+#endif
+        /// <summary>
+        /// The token of the telegram bot
+        /// </summary>
+        public static string BotToken
+        {
+            get => (string)RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+                .OpenSubKey("SOFTWARE").OpenSubKey("Crazypokemondev").OpenSubKey("WhoAmI").GetValue("APIToken");
+        }
     }
 }

@@ -64,6 +64,8 @@
     <Compile Include="Group.cs">
       <DependentUpon>WhoAmIDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Handlers\MessageHandler.cs" />
+    <Compile Include="Helpers\Bot.cs" />
     <Compile Include="Helpers\GroupSettings.cs" />
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Player.cs">
