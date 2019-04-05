@@ -35,10 +35,6 @@ namespace WhoAmIBotReloaded
 
             KeepAliveThread = new Thread(KeepAlive);
             KeepAliveThread.Start();
-
-            Update();
-
-            KeepAliveThread.Abort();
         }
 
         private static void KeepAlive()
