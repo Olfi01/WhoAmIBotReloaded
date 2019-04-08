@@ -25,6 +25,7 @@ namespace WhoAmIBotReloaded.Helpers
             Id = me.Id;
         }
 
+        public void Append(Message message, string textToAppend) => Append(ref message, textToAppend);
         /// <summary>
         /// Appends the specified text to the end of the message
         /// </summary>

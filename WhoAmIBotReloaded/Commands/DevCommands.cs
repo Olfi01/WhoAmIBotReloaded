@@ -25,8 +25,15 @@ namespace WhoAmIBotReloaded.Commands
                 Bot.Api.AnswerCallbackQueryAsync(u.CallbackQuery.Id);
                 Bot.Append(ref message, $"\n\n{u.CallbackQuery.From.FirstName} chose to update.");
             }
-            Program.UpdateAsync(message).ContinueWith(x => Program.ShutdownHandle.Set());
+            Program.UpdateAsync(message).ContinueWith(x => { if (x.Result) Program.ShutdownHandle.Set(); else Bot.Append(ref message, "\nUpdate failed!"); });
             // TODO: Wait for all games to end and then set the shutdown handle
+        }
+
+        [Command("dontupdate", PermissionLevel = PermissionLevel.DevOnly, Types = CommandTypes.CallbackQuery)]
+        public static void DontUpdate(Update u, string[] args)
+        {
+            Bot.Append(u.CallbackQuery.Message, $"\nNo work for me, then! :)");
+            Bot.Api.AnswerCallbackQueryAsync(u.CallbackQuery.Id);
         }
     }
 }

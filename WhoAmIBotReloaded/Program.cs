@@ -30,6 +30,8 @@ namespace WhoAmIBotReloaded
                 var waitHandle = args[0];
                 var eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset, waitHandle);
                 eventWaitHandle.Set();
+                // give old program time to shut down
+                Thread.Sleep(1000);
             }
 
             DB = new WhoAmIDBContainer(Settings.DbConnectionString);
@@ -98,64 +100,72 @@ namespace WhoAmIBotReloaded
         /// <returns></returns>
         public static bool Update(Message msg)
         {
-            if (Settings.GitDirectory == null) return false;
-
-            if (msg != null) Bot.Append(ref msg, "\nPulling git...");
-            // Assumes that git is installed and on the PATH.
-            ProcessStartInfo psi = new ProcessStartInfo
+            try
             {
-                WorkingDirectory = Settings.GitDirectory,
-                FileName = "git",
-                Arguments = $"pull {Settings.GitRepository ?? ""} {(Settings.GitRepository == null ? "" : Settings.GitBranch)}",
-                CreateNoWindow = true
-            };
-            var p = new Process { StartInfo = psi };
-            p.Start();
-            p.WaitForExit();
+                if (Settings.GitDirectory == null) return false;
 
-            if (msg != null) Bot.Append(ref msg, "\nRestoring nuget packages...");
-            // Assumes that nuget is installed and on the PATH
-            psi = new ProcessStartInfo
+                if (msg != null) Bot.Append(ref msg, "\nPulling git...");
+                // Assumes that git is installed and on the PATH.
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    WorkingDirectory = Settings.GitDirectory,
+                    FileName = "git",
+                    Arguments = $"pull {Settings.GitRepository ?? ""} {(Settings.GitRepository == null ? "" : Settings.GitBranch)}",
+                    CreateNoWindow = true
+                };
+                var p = new Process { StartInfo = psi };
+                p.Start();
+                p.WaitForExit();
+
+                if (msg != null) Bot.Append(ref msg, "\nRestoring nuget packages...");
+                // Assumes that nuget is installed and on the PATH
+                psi = new ProcessStartInfo
+                {
+                    WorkingDirectory = Settings.GitDirectory,
+                    FileName = "nuget",
+                    Arguments = "restore",
+                    CreateNoWindow = true
+                };
+
+                if (msg != null) Bot.Append(ref msg, "\nBuilding Solution...");
+                // Assumes that devenv is installed and on the PATH
+                psi = new ProcessStartInfo
+                {
+                    WorkingDirectory = Path.GetDirectoryName(Settings.SolutionPath),
+                    FileName = "devenv",
+                    Arguments = $"\"{Settings.SolutionPath}\" /Build Release",
+                    CreateNoWindow = true
+                };
+                p = new Process { StartInfo = psi };
+                p.Start();
+                p.WaitForExit();
+
+                string fromDir = Path.GetDirectoryName(Settings.ExecutablePath);
+                string newVersion = AssemblyName.GetAssemblyName(Settings.ExecutablePath).Version.ToString();
+                string toDir = Path.Combine(Settings.ExecutionDirectory, newVersion);
+                if (msg != null) Bot.Append(ref msg, $"\nCopying files to {toDir}...");
+                CopyRecursively(Directory.CreateDirectory(fromDir), Directory.CreateDirectory(toDir));
+                string copiedExe = Path.Combine(toDir, Path.GetFileName(Settings.ExecutablePath));
+
+                if (msg != null) Bot.Append(ref msg, $"\nStarting new Executable with version {newVersion}!");
+                string waitHandle = Guid.NewGuid().ToString();
+                psi = new ProcessStartInfo
+                {
+                    FileName = copiedExe,
+                    Arguments = waitHandle,
+                    WorkingDirectory = toDir
+                };
+                p = new Process { StartInfo = psi };
+                EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.ManualReset, waitHandle);
+                p.Start();
+                handle.WaitOne();
+                return true;
+            }
+            catch (Exception ex)
             {
-                WorkingDirectory = Settings.GitDirectory,
-                FileName = "nuget",
-                Arguments = "restore",
-                CreateNoWindow = true
-            };
-
-            if (msg != null) Bot.Append(ref msg, "\nBuilding Solution...");
-            // Assumes that devenv is installed and on the PATH
-            psi = new ProcessStartInfo
-            {
-                WorkingDirectory = Path.GetDirectoryName(Settings.SolutionPath),
-                FileName = "devenv",
-                Arguments = $"\"{Settings.SolutionPath}\" /Build Release",
-                CreateNoWindow = true
-            };
-            p = new Process { StartInfo = psi };
-            p.Start();
-            p.WaitForExit();
-
-            string fromDir = Path.GetDirectoryName(Settings.ExecutablePath);
-            string newVersion = AssemblyName.GetAssemblyName(Settings.ExecutablePath).Version.ToString();
-            string toDir = Path.Combine(Settings.ExecutionDirectory, newVersion);
-            if (msg != null) Bot.Append(ref msg, $"\nCopying files to {toDir}...");
-            CopyRecursively(Directory.CreateDirectory(fromDir), Directory.CreateDirectory(toDir));
-            string copiedExe = Path.Combine(toDir, Path.GetFileName(Settings.ExecutablePath));
-
-            if (msg != null) Bot.Append(ref msg, $"\nStarting new Executable with version {newVersion}!");
-            string waitHandle = Guid.NewGuid().ToString();
-            psi = new ProcessStartInfo
-            {
-                FileName = copiedExe,
-                Arguments = waitHandle,
-                WorkingDirectory = toDir
-            };
-            p = new Process { StartInfo = psi };
-            EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.ManualReset, waitHandle);
-            p.Start();
-            handle.WaitOne();
-            return true;
+                Bot.Send(Settings.DevChat, ex.ToString());
+                return false;
+            }
         }
 
         private static void CopyRecursively(DirectoryInfo fromDir, DirectoryInfo toDir)
