@@ -33,7 +33,7 @@ namespace WhoAmIBotReloaded.Helpers
         /// <param name="textToAppend">The text to append</param>
         public void Append(ref Message message, string textToAppend)
         {
-            Edit(ref message, message.Text += textToAppend);
+            Edit(ref message, message.Text + textToAppend);
         }
 
         /// <summary>

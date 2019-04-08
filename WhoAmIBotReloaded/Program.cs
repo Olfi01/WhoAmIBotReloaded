@@ -71,7 +71,6 @@ namespace WhoAmIBotReloaded
                 using (var sr = new StreamReader(context.Request.InputStream, context.Request.ContentEncoding))
                 {
                     var req = sr.ReadToEnd();
-                    Console.WriteLine(req);
                     dynamic payload = JsonConvert.DeserializeObject(req);
                     if (payload.@ref == $"refs/heads/{Settings.GitBranch}")
                     {
@@ -156,6 +155,7 @@ namespace WhoAmIBotReloaded
                     WorkingDirectory = toDir
                 };
                 p = new Process { StartInfo = psi };
+                p.Start();
                 EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.ManualReset, waitHandle);
                 p.Start();
                 handle.WaitOne();
