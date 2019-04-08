@@ -157,7 +157,6 @@ namespace WhoAmIBotReloaded
                     WorkingDirectory = toDir
                 };
                 p = new Process { StartInfo = psi };
-                p.Start();
                 EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.ManualReset, waitHandle);
                 p.Start();
                 handle.WaitOne();
