@@ -7,19 +7,21 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using WhoAmIBotReloaded.Handlers;
 using WhoAmIBotReloaded.Helpers;
-
 namespace WhoAmIBotReloaded
 {
     public class Program
     {
-        private static Bot Bot { get; set; }
-        private static Thread KeepAliveThread;
-        private static readonly ManualResetEvent ShutdownHandle = new ManualResetEvent(false);
+        public static Bot Bot { get; private set; }
+        public static WhoAmIDBContainer DB { get; private set; }
+        private static Thread UpdateListenerThread;
+        public static readonly ManualResetEvent ShutdownHandle = new ManualResetEvent(false);
         static void Main(string[] args)
         {
             if (args.Length > 0)
@@ -29,15 +31,33 @@ namespace WhoAmIBotReloaded
                 eventWaitHandle.Set();
             }
 
-            Bot = new Bot(Settings.BotToken, args.Length < 1);
-            Bot.Api.OnMessage += MessageHandler.MessageReceived;
-            Bot.Start();
+            DB = new WhoAmIDBContainer(Settings.DbConnectionString);
 
-            KeepAliveThread = new Thread(KeepAlive);
-            KeepAliveThread.Start();
+            Bot = new Bot(Settings.BotToken, args.Length < 1);
+            Bot.Api.OnUpdate += UpdateHandler.OnUpdate;
+            Bot.Start();
+            Console.Title = $"WhoAmIBotReloaded - {Bot.Username} ({Bot.Id})";
+
+            UpdateListenerThread = new Thread(ListenForUpdates);
+            UpdateListenerThread.Start();
+
+            ShutdownHandle.WaitOne();
+
+            // send the cleaner to clean up the execution directory
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = Settings.CleanerPath,
+                WorkingDirectory = Path.Combine(Environment.CurrentDirectory, ".."),
+                Arguments = Environment.CurrentDirectory
+            };
+            Process cleaner = new Process { StartInfo = psi };
+            cleaner.Start();
         }
 
-        private static void KeepAlive()
+        /// <summary>
+        /// Listens for updates from a git webhook
+        /// </summary>
+        private static void ListenForUpdates()
         {
             if (Settings.ListenForGitPrefix != null)
             {
@@ -49,7 +69,12 @@ namespace WhoAmIBotReloaded
                 {
                     var req = sr.ReadToEnd();
                     dynamic payload = JsonConvert.DeserializeObject<dynamic>(req);
-                    // TODO: check for correct json and react
+                    if (payload.@ref == $"refs/heads/{Settings.GitBranch}")
+                    {
+                        Bot.Api.SendTextMessageAsync(Settings.DevChat, 
+                            $"{payload.commits.Length} new commits to <a href=\"{payload.compare}\">{payload.@ref}</a>. Update?",
+                            replyMarkup: ReplyMarkups.GetUpdateMarkup()).Wait();
+                    }
                 }
                 using (var sw = new StreamWriter(context.Response.OutputStream))
                 {
@@ -57,28 +82,36 @@ namespace WhoAmIBotReloaded
                     sw.Flush();
                 }
             }
-            else
-            {
-                ShutdownHandle.WaitOne();
-            }
         }
 
-        public static bool Update()
+        public static async Task<bool> UpdateAsync(Message msg)
+        {
+            return await Task.Run(() => Update(msg));
+        }
+
+        /// <summary>
+        /// Updates the bot
+        /// </summary>
+        /// <param name="msg">The message to update with the progress, if any</param>
+        /// <returns></returns>
+        public static bool Update(Message msg)
         {
             if (Settings.GitDirectory == null) return false;
 
+            if (msg != null) Bot.Append(ref msg, "\nPulling git...");
             // Assumes that git is installed and on the PATH.
             ProcessStartInfo psi = new ProcessStartInfo
             {
                 WorkingDirectory = Settings.GitDirectory,
                 FileName = "git",
-                Arguments = $"pull {Settings.GitRepository ?? ""} {(Settings.GitRepository == null ? "" : Settings.GitBranch ?? "")}",
+                Arguments = $"pull {Settings.GitRepository ?? ""} {(Settings.GitRepository == null ? "" : Settings.GitBranch)}",
                 CreateNoWindow = true
             };
             var p = new Process { StartInfo = psi };
             p.Start();
             p.WaitForExit();
 
+            if (msg != null) Bot.Append(ref msg, "\nRestoring nuget packages...");
             // Assumes that nuget is installed and on the PATH
             psi = new ProcessStartInfo
             {
@@ -88,6 +121,7 @@ namespace WhoAmIBotReloaded
                 CreateNoWindow = true
             };
 
+            if (msg != null) Bot.Append(ref msg, "\nBuilding Solution...");
             // Assumes that devenv is installed and on the PATH
             psi = new ProcessStartInfo
             {
@@ -100,17 +134,34 @@ namespace WhoAmIBotReloaded
             p.Start();
             p.WaitForExit();
 
+            string fromDir = Path.GetDirectoryName(Settings.ExecutablePath);
+            string newVersion = AssemblyName.GetAssemblyName(Settings.ExecutablePath).Version.ToString();
+            string toDir = Path.Combine(Settings.ExecutionDirectory, newVersion);
+            if (msg != null) Bot.Append(ref msg, $"\nCopying files to {toDir}...");
+            CopyRecursively(Directory.CreateDirectory(fromDir), Directory.CreateDirectory(toDir));
+            string copiedExe = Path.Combine(toDir, Path.GetFileName(Settings.ExecutablePath));
+
+            if (msg != null) Bot.Append(ref msg, $"\nStarting new Executable with version {newVersion}!");
             string waitHandle = Guid.NewGuid().ToString();
             psi = new ProcessStartInfo
             {
-                FileName = Settings.ExecutablePath,
-                Arguments = waitHandle
+                FileName = copiedExe,
+                Arguments = waitHandle,
+                WorkingDirectory = toDir
             };
             p = new Process { StartInfo = psi };
             EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.ManualReset, waitHandle);
             p.Start();
             handle.WaitOne();
             return true;
+        }
+
+        private static void CopyRecursively(DirectoryInfo fromDir, DirectoryInfo toDir)
+        {
+            foreach (var subdir in fromDir.EnumerateDirectories())
+                CopyRecursively(subdir, toDir.CreateSubdirectory(subdir.Name));
+            foreach (var file in fromDir.EnumerateFiles())
+                file.CopyTo(Path.Combine(toDir.FullName, file.Name));
         }
     }
 }

@@ -10,6 +10,11 @@ namespace WhoAmIBotReloaded.Helpers
         /// </summary>
         public static readonly int[] Devs = { 267376056 };
         /// <summary>
+        /// The id of the chat to send update requests to
+        /// </summary>
+        public static readonly long DevChat = -1001070844778;
+        #region Updating
+        /// <summary>
         /// Base directory of the git repository. If this is empty, git will not be used to update.
         /// </summary>
         public static readonly string GitDirectory = "C:\\Olfi01\\WhoAmIBotReloaded\\";
@@ -22,9 +27,17 @@ namespace WhoAmIBotReloaded.Helpers
         /// </summary>
         public static readonly string ExecutablePath = Path.Combine(GitDirectory, "WhoAmIBotReloaded\\bin\\Release\\WhoAmIBotReloaded.exe");
         /// <summary>
-        /// Branch to use for updating. If this is null, git pull is called without a specific branch.
+        /// The path to copy to and execute the program in
         /// </summary>
-        public static readonly string GitBranch = null;
+        public static readonly string ExecutionDirectory = "C:\\Olfi01\\WhoAmIBotReloadedExec\\";
+        /// <summary>
+        /// Path of the cleaner executable
+        /// </summary>
+        public static readonly string CleanerPath = Path.Combine(GitDirectory, "Cleaner\\bin\\Release\\Cleaner.exe");
+        /// <summary>
+        /// Branch to use for updating.
+        /// </summary>
+        public static readonly string GitBranch = "master";
         /// <summary>
         /// Repository to pull from. If this is null, the default upstream repo will be used.
         /// </summary>
@@ -37,6 +50,7 @@ namespace WhoAmIBotReloaded.Helpers
 #else
         public static readonly string ListenForGitPrefix = "http://185.249.197.95:4242/whoAmIGit/";
 #endif
+        #endregion
         /// <summary>
         /// The token of the telegram bot
         /// </summary>
@@ -44,6 +58,14 @@ namespace WhoAmIBotReloaded.Helpers
         {
             get => (string)RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                 .OpenSubKey("SOFTWARE").OpenSubKey("Crazypokemondev").OpenSubKey("WhoAmI").GetValue("APIToken");
+        }
+        /// <summary>
+        /// The connection string for the sql database
+        /// </summary>
+        public static string DbConnectionString
+        {
+            get => (string)RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+                .OpenSubKey("SOFTWARE").OpenSubKey("Crazypokemondev").OpenSubKey("WhoAmI").GetValue("ConnectionString");
         }
     }
 }

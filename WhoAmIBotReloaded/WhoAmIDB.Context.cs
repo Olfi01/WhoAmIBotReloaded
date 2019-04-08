@@ -15,8 +15,8 @@ namespace WhoAmIBotReloaded
     
     public partial class WhoAmIDBContainer : DbContext
     {
-        public WhoAmIDBContainer()
-            : base("name=WhoAmIDBContainer")
+        public WhoAmIDBContainer(string nameOrConnectionString)
+            : base(nameOrConnectionString)
         {
         }
     
