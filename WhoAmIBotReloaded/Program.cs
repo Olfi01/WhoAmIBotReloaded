@@ -45,6 +45,7 @@ namespace WhoAmIBotReloaded
             UpdateListenerThread.Start();
 
             ShutdownHandle.WaitOne();
+            UpdateListenerThread.Abort();
 
             // send the cleaner to clean up the execution directory
             ProcessStartInfo psi = new ProcessStartInfo
@@ -55,6 +56,7 @@ namespace WhoAmIBotReloaded
             };
             Process cleaner = new Process { StartInfo = psi };
             cleaner.Start();
+            Environment.Exit(0);
         }
 
         /// <summary>
