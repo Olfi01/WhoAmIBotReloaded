@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using WhoAmIBotReloaded.Handlers;
 using WhoAmIBotReloaded.Helpers;
 namespace WhoAmIBotReloaded
@@ -65,15 +66,16 @@ namespace WhoAmIBotReloaded
                 listener.Prefixes.Add(Settings.ListenForGitPrefix);
                 listener.Start();
                 var context = listener.GetContext();
-                using (var sr = new StreamReader(context.Request.InputStream))
+                using (var sr = new StreamReader(context.Request.InputStream, context.Request.ContentEncoding))
                 {
                     var req = sr.ReadToEnd();
-                    dynamic payload = JsonConvert.DeserializeObject<dynamic>(req);
+                    Console.WriteLine(req);
+                    dynamic payload = JsonConvert.DeserializeObject(req);
                     if (payload.@ref == $"refs/heads/{Settings.GitBranch}")
                     {
                         Bot.Api.SendTextMessageAsync(Settings.DevChat, 
-                            $"{payload.commits.Length} new commits to <a href=\"{payload.compare}\">{payload.@ref}</a>. Update?",
-                            replyMarkup: ReplyMarkups.GetUpdateMarkup()).Wait();
+                            $"{payload.commits.Count} new commits to <a href=\"{payload.compare}\">{payload.@ref}</a>. Update?",
+                            replyMarkup: ReplyMarkups.GetUpdateMarkup(), parseMode: ParseMode.Html).Wait();
                     }
                 }
                 using (var sw = new StreamWriter(context.Response.OutputStream))
