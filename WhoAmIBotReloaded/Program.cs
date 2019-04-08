@@ -39,7 +39,7 @@ namespace WhoAmIBotReloaded
             Bot = new Bot(Settings.BotToken, args.Length < 1);
             Bot.Api.OnUpdate += UpdateHandler.OnUpdate;
             Bot.Start();
-            Console.Title = $"WhoAmIBotReloaded - {Bot.Username} ({Bot.Id})";
+            Console.Title = $"WhoAmIBotReloaded - {Bot.Username} ({Bot.Id}) - Version {Assembly.GetExecutingAssembly().GetName().Version}";
 
             UpdateListenerThread = new Thread(ListenForUpdates);
             UpdateListenerThread.Start();
