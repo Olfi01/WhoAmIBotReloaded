@@ -70,7 +70,7 @@ namespace WhoAmIBotReloaded.Handlers
                 var maybeCommand = e.Update.Message.Text.Split(' ').First();
                 var exec = commands.Where(
                     x => x.Key.Types.HasFlag(CommandTypes.Message) 
-                    && CommandAttribute.CommandPrefixes.Any(pref => pref + maybeCommand == x.Key.Trigger));
+                    && CommandAttribute.CommandPrefixes.Any(pref => pref + x.Key.Trigger == maybeCommand));
                 foreach (var command in exec)
                 {
                     if (CheckPermissions(e.Update.Message.From, command.Key.PermissionLevel, e.Update.Message.Chat))
