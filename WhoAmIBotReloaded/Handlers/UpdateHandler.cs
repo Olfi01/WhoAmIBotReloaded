@@ -30,9 +30,9 @@ namespace WhoAmIBotReloaded.Handlers
             Type[] commandClasses = { typeof(DevCommands), typeof(GeneralCommands) };
             foreach (var cc in commandClasses)
             {
-                cc.GetField("Bot", BindingFlags.NonPublic | BindingFlags.Static).SetValue(null, Bot);
-                var defaultPermissionLevel = (PermissionLevel)cc.GetField("DefaultPermissionLevel", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
-                var defaultCommandTypes = (CommandTypes)cc.GetField("DefaultCommandTypes", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                cc.GetField("Bot", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).SetValue(null, Bot);
+                var defaultPermissionLevel = (PermissionLevel)cc.GetField("DefaultPermissionLevel", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).GetValue(null);
+                var defaultCommandTypes = (CommandTypes)cc.GetField("DefaultCommandTypes", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).GetValue(null);
                 foreach (var method in cc.GetMethods())
                 {
                     CommandAttribute commandAttribute = method.GetCustomAttribute<CommandAttribute>();
@@ -93,6 +93,7 @@ namespace WhoAmIBotReloaded.Handlers
             }
             catch (Exception ex)
             {
+                if (ex is TargetInvocationException outerex) ex = outerex.InnerException;
                 Bot.Api.SendTextMessageAsync(Settings.DevChat, ex.ToString(), disableNotification: true).Wait();
             }
         }
