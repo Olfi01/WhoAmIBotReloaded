@@ -53,7 +53,7 @@ namespace WhoAmIBotReloaded.Commands
                         using (IDataReader reader = command.ExecuteReader())
                         {
                             var columns = new List<string>();
-                            foreach (DataRow schemaRow in reader.GetSchemaTable().Rows) columns.Add($"{schemaRow["ColumnName"]} ({schemaRow["DataType"]})");
+                            foreach (DataRow schemaRow in reader.GetSchemaTable().Rows) columns.Add($"{schemaRow["ColumnName"]} ({((Type)schemaRow["DataType"]).Name})");
                             response += string.Join(" | ", columns);
                             while (reader.Read())
                             {
