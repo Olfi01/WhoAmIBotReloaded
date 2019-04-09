@@ -33,6 +33,7 @@ namespace WhoAmIBotReloaded
         public int DidNotKnow { get; set; }
         public string LanguageCode { get; set; }
         public bool IsGlobalAdmin { get; set; }
+        public string Language { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Player> GamePlayers { get; set; }

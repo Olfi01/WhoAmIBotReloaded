@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/09/2019 13:06:06
+-- Date Created: 04/09/2019 16:38:37
 -- Generated from EDMX file: C:\Users\flmeyer\source\repos\WhoAmIBotReloaded\WhoAmIBotReloaded\WhoAmIDB.edmx
 -- --------------------------------------------------
 
@@ -61,7 +61,8 @@ CREATE TABLE [dbo].[Users] (
     [QuestionsAnswered] int  NOT NULL,
     [DidNotKnow] int  NOT NULL,
     [LanguageCode] nvarchar(max)  NULL,
-    [IsGlobalAdmin] bit  NOT NULL
+    [IsGlobalAdmin] bit  NOT NULL,
+    [Language] nvarchar(max)  NOT NULL
 );
 GO
 
@@ -71,7 +72,8 @@ CREATE TABLE [dbo].[Groups] (
     [Title] nvarchar(max)  NOT NULL,
     [Username] nvarchar(max)  NULL,
     [Type] nvarchar(max)  NOT NULL,
-    [JSONSettings] nvarchar(max)  NOT NULL
+    [JSONSettings] nvarchar(max)  NOT NULL,
+    [Language] nvarchar(max)  NOT NULL
 );
 GO
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
@@ -27,13 +28,19 @@ namespace WhoAmIBotReloaded.Commands
             if (u.Message.Chat.Type != ChatType.Private) return;
             TgUser user = u.Message.From;
             var dbUser = DB.Users.Find(user.Id);
-            if (dbUser == null) dbUser = DB.Users.Add(user.CreateDbUser());
+            if (dbUser == null) dbUser = DB.Users.Add(user.CreateDbUser(Bot.GetLanguage(user.LanguageCode)));
             dbUser.FirstName = user.FirstName;
             dbUser.LastName = user.LastName;
-            if (dbUser.LanguageCode == null) dbUser.LanguageCode = user.LanguageCode;
+            dbUser.LanguageCode = user.LanguageCode;
             dbUser.Username = user.Username;
             DB.SaveChanges();
             Bot.SendLocale(user.Id, "Start");
+        }
+
+        [Command("version")]
+        public static void Version(Update u, string[] args)
+        {
+            Bot.SendLocale(u.Message.Chat, "Version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
         }
     }
 }

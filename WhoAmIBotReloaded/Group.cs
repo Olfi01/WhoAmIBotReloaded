@@ -26,6 +26,7 @@ namespace WhoAmIBotReloaded
         public string Username { get; set; }
         public string Type { get; set; }
         public string JSONSettings { get; set; }
+        public string Language { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Game> Games { get; set; }

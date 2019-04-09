@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using File = System.IO.File;
 
 namespace WhoAmIBotReloaded.Helpers
 {
@@ -15,6 +17,9 @@ namespace WhoAmIBotReloaded.Helpers
         public string Username { get; }
         public int Id { get; }
         private const ParseMode defaultParseMode = ParseMode.Html;
+        public List<Language> Languages = new List<Language>();
+        public Language DefaultLanguage { get => Languages.First(x => x.Info.Name == Settings.MasterLanguageFile ); }
+        private static WhoAmIDBContainer DB { get => Program.DB; }
 
         public Bot(string token, bool clearupdates)
         {
@@ -23,6 +28,35 @@ namespace WhoAmIBotReloaded.Helpers
             var me = Api.GetMeAsync().Result;
             Username = me.Username;
             Id = me.Id;
+            LoadLanguages();
+        }
+
+        private void LoadLanguages()
+        {
+            var languageDirectory = Directory.CreateDirectory(Settings.LanguageDirectory);
+            foreach (var file in languageDirectory.EnumerateFiles())
+            {
+                if (file.Extension != "json") continue;
+                using (var sr = new StreamReader(file.OpenRead(), Encoding.UTF8))
+                {
+                    Languages.Add(JsonConvert.DeserializeObject<Language>(sr.ReadToEnd()));
+                }
+            }
+            string masterFileName = $"{Settings.MasterLanguageFile}.json";
+            string masterSourceFile = Path.Combine(Settings.ExecutionDirectory, masterFileName);
+            string masterDestinationFile = Path.Combine(Settings.LanguageDirectory, masterFileName);
+            if (!Languages.Any(x => x.Info.Name == Settings.MasterLanguageFile) || File.GetLastWriteTimeUtc(masterSourceFile) > File.GetLastWriteTimeUtc(masterDestinationFile))
+            {
+                File.Copy(masterSourceFile, masterDestinationFile, true);
+                ReloadLangFile(masterDestinationFile);
+            }
+        }
+
+        public void ReloadLangFile(string filePath)
+        {
+            Language lang = JsonConvert.DeserializeObject<Language>(File.ReadAllText(filePath, Encoding.UTF8));
+            Languages.RemoveAll(x => x.Info.Name == lang.Info.Name);
+            Languages.Add(lang);
         }
 
         public void Append(Message message, string textToAppend) => Append(ref message, textToAppend);
@@ -91,12 +125,39 @@ namespace WhoAmIBotReloaded.Helpers
         public string GetChatLocaleString(long chatId, string localeStringKey, params string[] values)
         {
             if (chatId > 0 && chatId <= int.MaxValue) return GetUserLocaleString((int)chatId, localeStringKey, values);
-            throw new NotImplementedException();
+            string language = GetChatLanguage(chatId);
+            return GetLocaleString(language, localeStringKey, values);
+        }
+
+        private string GetChatLanguage(long chatId)
+        {
+            return DB.Groups.Find(chatId)?.Language ?? DefaultLanguage.Info.Name;
         }
 
         public string GetUserLocaleString(int userId, string localeStringKey, params string[] values)
         {
-            throw new NotImplementedException();
+            string language = GetUserLanguage(userId);
+            return GetLocaleString(language, localeStringKey, values);
+        }
+
+        private string GetUserLanguage(int userId)
+        {
+            return DB.Users.Find(userId)?.Language ?? DefaultLanguage.Info.Name;
+        }
+
+        private string GetLocaleString(string language, string localeStringKey, params string[] values)
+        {
+            var lang = Languages.FirstOrDefault(x => x.Info.Name == language) ?? DefaultLanguage;
+            if (lang.Strings.ContainsKey(localeStringKey)) return string.Format(lang.Strings[localeStringKey], values);
+            if (DefaultLanguage.Strings.ContainsKey(localeStringKey)) return string.Format(DefaultLanguage.Strings[localeStringKey], values);
+            return $"Missing string: {localeStringKey}";
+        }
+
+        internal string GetLanguage(string languageCode)
+        {
+            if (string.IsNullOrWhiteSpace(languageCode)) return DefaultLanguage.Info.Name;
+            var lang = Languages.FirstOrDefault(x => x.Info.LanguageCode.StartsWith(languageCode));
+            return (lang ?? DefaultLanguage).Info.Name;
         }
 
         public Message Send(ChatId chatId, string messageText, ParseMode parseMode = defaultParseMode)

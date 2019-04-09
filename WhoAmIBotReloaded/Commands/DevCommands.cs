@@ -65,6 +65,7 @@ namespace WhoAmIBotReloaded.Commands
                                 response += reader.GetValue(reader.FieldCount - 1);
                             }
                         }
+                        command.Connection.Close();
                     }
                     Bot.Send(u.Message.Chat.Id, response, ParseMode.Default);
                 }

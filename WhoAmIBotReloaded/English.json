@@ -1,0 +1,14 @@
+﻿{
+  "Info": {
+    "Name": "English",
+    "Base": "English",
+    "Variant": "Default",
+    "LanguageCode": "en"
+  },
+  "Strings": {
+    "NoPermission": "You don't have permission to use this command!",
+    "Ping": "I'm here!",
+    "Start": "Hi there! I am WhoAmIBot! Currently I am undergoing maintenance, but if we're lucky I might be back soon!",
+    "Version": "The bot is currently running version {0}."
+  }
+}

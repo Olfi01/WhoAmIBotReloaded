@@ -40,6 +40,7 @@
     <Property Name="DidNotKnow" Type="int" Nullable="false" DefaultValue="0" />
     <Property Name="LanguageCode" Type="nvarchar(max)" Nullable="true" />
     <Property Name="IsGlobalAdmin" Type="bit" Nullable="false" DefaultValue="false" />
+    <Property Name="Language" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
   <EntityType Name="Groups">
     <Key>
@@ -50,6 +51,7 @@
     <Property Name="Username" Type="nvarchar(max)" Nullable="true" />
     <Property Name="Type" Type="nvarchar(max)" Nullable="false" />
     <Property Name="JSONSettings" Type="nvarchar(max)" Nullable="false" DefaultValue="{}" />
+    <Property Name="Language" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
   <EntityType Name="Games">
     <Key>
@@ -165,6 +167,7 @@
           <NavigationProperty Name="GamePlayers" Relationship="WhoAmIDB.PlayerUser" FromRole="User" ToRole="Player" />
           <Property Name="LanguageCode" Type="String" Nullable="true" />
           <Property Name="IsGlobalAdmin" Type="Boolean" Nullable="false" DefaultValue="false" />
+          <Property Name="Language" Type="String" Nullable="false" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -176,6 +179,7 @@
           <Property Name="Type" Type="String" Nullable="false" />
           <NavigationProperty Name="Games" Relationship="WhoAmIDB.GameGroup" FromRole="Group" ToRole="Game" />
           <Property Name="JSONSettings" Type="String" Nullable="false" DefaultValue="{}" />
+          <Property Name="Language" Type="String" Nullable="false" />
         </EntityType>
         <EntityType Name="Game">
           <Key>
@@ -248,6 +252,7 @@
           <ScalarProperty Name="DidNotKnow" ColumnName="DidNotKnow" />
           <ScalarProperty Name="LanguageCode" ColumnName="LanguageCode" />
           <ScalarProperty Name="IsGlobalAdmin" ColumnName="IsGlobalAdmin" />
+          <ScalarProperty Name="Language" ColumnName="Language" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -259,6 +264,7 @@
           <ScalarProperty Name="Username" ColumnName="Username" />
           <ScalarProperty Name="Type" ColumnName="Type" />
           <ScalarProperty Name="JSONSettings" ColumnName="JSONSettings" />
+          <ScalarProperty Name="Language" ColumnName="Language" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
