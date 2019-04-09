@@ -86,6 +86,7 @@
     <Compile Include="Handlers\UpdateHandler.cs" />
     <Compile Include="Helpers\Bot.cs" />
     <Compile Include="Helpers\CommandAttribute.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\GroupSettings.cs" />
     <Compile Include="Helpers\ReplyMarkups.cs" />
     <Compile Include="Helpers\Settings.cs" />

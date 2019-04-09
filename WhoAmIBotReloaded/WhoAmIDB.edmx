@@ -39,7 +39,7 @@
     <Property Name="QuestionsAnswered" Type="int" Nullable="false" DefaultValue="0" />
     <Property Name="DidNotKnow" Type="int" Nullable="false" DefaultValue="0" />
     <Property Name="LanguageCode" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="IsGlobalAdmin" Type="bit" Nullable="false" />
+    <Property Name="IsGlobalAdmin" Type="bit" Nullable="false" DefaultValue="false" />
   </EntityType>
   <EntityType Name="Groups">
     <Key>
@@ -164,7 +164,7 @@
           <Property Name="DidNotKnow" Type="Int32" Nullable="false" DefaultValue="0" />
           <NavigationProperty Name="GamePlayers" Relationship="WhoAmIDB.PlayerUser" FromRole="User" ToRole="Player" />
           <Property Name="LanguageCode" Type="String" Nullable="true" />
-          <Property Name="IsGlobalAdmin" Type="Boolean" Nullable="false" />
+          <Property Name="IsGlobalAdmin" Type="Boolean" Nullable="false" DefaultValue="false" />
         </EntityType>
         <EntityType Name="Group">
           <Key>

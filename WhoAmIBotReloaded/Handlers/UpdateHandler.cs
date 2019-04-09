@@ -31,6 +31,7 @@ namespace WhoAmIBotReloaded.Handlers
             foreach (var cc in commandClasses)
             {
                 cc.GetField("Bot", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).SetValue(null, Bot);
+                cc.GetField("DB", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).SetValue(null, DB);
                 var defaultPermissionLevel = (PermissionLevel)cc.GetField("DefaultPermissionLevel", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).GetValue(null);
                 var defaultCommandTypes = (CommandTypes)cc.GetField("DefaultCommandTypes", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).GetValue(null);
                 foreach (var method in cc.GetMethods())

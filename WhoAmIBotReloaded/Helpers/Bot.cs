@@ -53,9 +53,10 @@ namespace WhoAmIBotReloaded.Helpers
         /// </summary>
         /// <param name="query">The callback query to answer to</param>
         /// <param name="localeStringKey">The key used to identify the string in localization</param>
-        public void ReplyLocaleToQuery(CallbackQuery query, string localeStringKey, bool showAlert = false)
+        /// <param name="values">The values to replace {#} with</param>
+        public void ReplyLocaleToQuery(CallbackQuery query, string localeStringKey, bool showAlert = false, params string[] values)
         {
-            var localizedString = GetUserLocaleString(query.From.Id, localeStringKey);
+            var localizedString = GetUserLocaleString(query.From.Id, localeStringKey, values);
             Api.AnswerCallbackQueryAsync(query.Id, text: localizedString, showAlert: showAlert).Wait();
         }
 
@@ -64,6 +65,7 @@ namespace WhoAmIBotReloaded.Helpers
         /// </summary>
         /// <param name="chat">The chat to send the message to</param>
         /// <param name="localeStringKey">The key used to identify the string in localization</param>
+        /// <param name="values">The values to replace {#} with</param>
         /// <returns></returns>
         public Message SendLocale(Chat chat, string localeStringKey, params string[] values) => SendLocale(chat.Id, localeStringKey, values);
         /// <summary>
@@ -71,6 +73,7 @@ namespace WhoAmIBotReloaded.Helpers
         /// </summary>
         /// <param name="chatId">The unique identifier of the chat to send the message to</param>
         /// <param name="localeStringKey">The key used to identify the string in localization</param>
+        /// <param name="values">The values to replace {#} with</param>
         /// <returns></returns>
         public Message SendLocale(long chatId, string localeStringKey, params string[] values)
         {
@@ -78,8 +81,16 @@ namespace WhoAmIBotReloaded.Helpers
             return Send(chatId, localizedString);
         }
 
+        /// <summary>
+        /// Returns a localized string for the given chat (private or group)
+        /// </summary>
+        /// <param name="chatId">Id of the chat</param>
+        /// <param name="localeStringKey">The key used to identify the string in localization</param>
+        /// <param name="values">The values to replace {#} with</param>
+        /// <returns>The localized string</returns>
         public string GetChatLocaleString(long chatId, string localeStringKey, params string[] values)
         {
+            if (chatId > 0 && chatId <= int.MaxValue) return GetUserLocaleString((int)chatId, localeStringKey, values);
             throw new NotImplementedException();
         }
 

@@ -20,6 +20,7 @@ namespace WhoAmIBotReloaded
             this.QuestionsAsked = 0;
             this.QuestionsAnswered = 0;
             this.DidNotKnow = 0;
+            this.IsGlobalAdmin = false;
             this.GamePlayers = new HashSet<Player>();
         }
     

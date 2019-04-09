@@ -11,6 +11,8 @@ namespace WhoAmIBotReloaded.Commands
     {
         // will be injected
         protected static Bot Bot;
+        // will also be injected
+        protected static WhoAmIDBContainer DB;
 
         internal static PermissionLevel DefaultPermissionLevel = PermissionLevel.All;
         internal static CommandTypes DefaultCommandTypes = CommandTypes.Message;

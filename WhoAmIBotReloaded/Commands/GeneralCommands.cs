@@ -4,16 +4,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using WhoAmIBotReloaded.Helpers;
+using TgUser = Telegram.Bot.Types.User;
 
 namespace WhoAmIBotReloaded.Commands
 {
     public class GeneralCommands : Commands
     {
+        internal static new PermissionLevel DefaultPermissionLevel = PermissionLevel.All;
+        internal static new CommandTypes DefaultCommandTypes = CommandTypes.Message;
+
         [Command("ping")]
         public static void Ping(Update u, string[] args)
         {
             Bot.SendLocale(u.Message.Chat.Id, "Ping");
+        }
+
+        [Command("start")]
+        public static void Start(Update u, string[] args)
+        {
+            if (u.Message.Chat.Type != ChatType.Private) return;
+            TgUser user = u.Message.From;
+            var dbUser = DB.Users.Find(user.Id);
+            if (dbUser == null) dbUser = DB.Users.Add(user.CreateDbUser());
+            dbUser.FirstName = user.FirstName;
+            dbUser.LastName = user.LastName;
+            if (dbUser.LanguageCode == null) dbUser.LanguageCode = user.LanguageCode;
+            dbUser.Username = user.Username;
+            DB.SaveChanges();
+            Bot.SendLocale(user.Id, "Start");
         }
     }
 }

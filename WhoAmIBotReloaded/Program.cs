@@ -79,7 +79,9 @@ namespace WhoAmIBotReloaded
                         if (payload.@ref == $"refs/heads/{Settings.GitBranch}")
                         {
                             Bot.Api.SendTextMessageAsync(Settings.DevChat,
-                                $"{payload.commits.Count} new commits to <a href=\"{payload.compare}\">{payload.@ref}</a>. Update?",
+                                $"{payload.commits.Count} new commits to <a href=\"{payload.compare}\">{payload.@ref}</a>.\n" +
+                                $"Head commit: <a href=\"{payload.head_commit.url}\">{payload.head_commit.message}</a>\n" +
+                                $"Update?",
                                 replyMarkup: ReplyMarkups.GetUpdateMarkup(), parseMode: ParseMode.Html).Wait();
                         }
                     }
