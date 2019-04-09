@@ -93,7 +93,7 @@ namespace WhoAmIBotReloaded.Handlers
             }
             catch (Exception ex)
             {
-                Bot.Api.SendTextMessageAsync(Settings.DevChat, ex.ToString(), disableNotification: true);
+                Bot.Api.SendTextMessageAsync(Settings.DevChat, ex.ToString(), disableNotification: true).Wait();
             }
         }
 
