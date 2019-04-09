@@ -67,10 +67,11 @@ namespace WhoAmIBotReloaded.Handlers
             }
             else if (e.Update.Type == UpdateType.Message && e.Update.Message.Type == MessageType.Text)
             {
-                var maybeCommand = e.Update.Message.Text.Split(' ').First();
+                var maybeCommand = e.Update.Message.Text.Split(' ').First().ToLower();
+                if (maybeCommand.EndsWith($"@{Bot.Username.ToLower()}")) maybeCommand = maybeCommand.Substring(0, maybeCommand.Length - 1 - Bot.Username.Length);
                 var exec = commands.Where(
                     x => x.Key.Types.HasFlag(CommandTypes.Message) 
-                    && CommandAttribute.CommandPrefixes.Any(pref => pref + x.Key.Trigger == maybeCommand));
+                    && CommandAttribute.CommandPrefixes.Any(pref => pref + x.Key.Trigger.ToLower() == maybeCommand));
                 foreach (var command in exec)
                 {
                     if (CheckPermissions(e.Update.Message.From, command.Key.PermissionLevel, e.Update.Message.Chat))
