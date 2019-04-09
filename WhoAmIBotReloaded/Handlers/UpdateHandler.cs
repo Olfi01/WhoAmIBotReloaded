@@ -63,7 +63,7 @@ namespace WhoAmIBotReloaded.Handlers
                     {
                         if (CheckPermissions(e.Update.CallbackQuery.From, command.Key.PermissionLevel))
                         {
-                            command.Value.Invoke(null, new object[] { e.Update, new string[0] });
+                            command.Value.Invoke(null, new object[] { e.Update, e.Update.CallbackQuery.Data.Split(' ') });
                         }
                         else
                         {
@@ -83,7 +83,7 @@ namespace WhoAmIBotReloaded.Handlers
                     {
                         if (CheckPermissions(e.Update.Message.From, command.Key.PermissionLevel, e.Update.Message.Chat))
                         {
-                            command.Value.Invoke(null, new object[] { e.Update, e.Update.Message.Text.Split(' ') });
+                            command.Value.Invoke(null, new object[] { e.Update, e.Update.Message.Text.Split(' ').Skip(1).ToArray() });
                         }
                         else
                         {
