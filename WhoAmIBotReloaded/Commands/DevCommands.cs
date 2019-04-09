@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +33,57 @@ namespace WhoAmIBotReloaded.Commands
         {
             Bot.Append(u.CallbackQuery.Message, $"\nNo work for me, then! :)");
             Bot.Api.AnswerCallbackQueryAsync(u.CallbackQuery.Id);
+        }
+
+        [Command("sql", Types = CommandTypes.Message)]
+        public static void SQL(Update u, string[] args)
+        {
+            if (args.Length < 1) Bot.Send(u.Message.Chat.Id, "No query found.");
+            var fullCommand = string.Join(" ", args);
+            if (args[0].ToLower() == "select")
+            {
+                try
+                {
+                    string response = "";
+                    using (IDbCommand command = DB.Database.Connection.CreateCommand())
+                    {
+                        command.CommandText = fullCommand;
+                        command.CommandTimeout = DB.Database.Connection.ConnectionTimeout;
+                        using (IDataReader reader = command.ExecuteReader())
+                        {
+                            var columns = new List<string>();
+                            foreach (DataRow schemaRow in reader.GetSchemaTable().Rows) columns.Add($"{schemaRow["ColumnName"]} ({schemaRow["DataType"]})");
+                            response += string.Join(" | ", columns);
+                            while (reader.Read())
+                            {
+                                response += "\n";
+                                for (int i = 0; i < reader.FieldCount - 1; i++)
+                                {
+                                    response += reader.GetValue(i) + " | ";
+                                }
+                                response += reader.GetValue(reader.FieldCount - 1);
+                            }
+                        }
+                    }
+                    Bot.Send(u.Message.Chat.Id, response, ParseMode.Default);
+                }
+                catch (Exception ex)
+                {
+                    Bot.Send(u.Message.Chat.Id, $"Failed to execute query: <b>{ex.Message}</b>");
+                }
+            }
+            else
+            {
+                try
+                {
+                    int affected = DB.Database.ExecuteSqlCommand(fullCommand);
+                    Bot.Send(u.Message.Chat.Id, $"{affected} rows affected.");
+                }
+                catch (Exception ex)
+                {
+                    Bot.Send(u.Message.Chat.Id, $"Failed to execute query: <b>{ex.Message}</b>");
+                }
+            }
         }
     }
 }
