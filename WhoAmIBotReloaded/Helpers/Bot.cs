@@ -43,7 +43,7 @@ namespace WhoAmIBotReloaded.Helpers
                 }
             }
             string masterFileName = $"{Settings.MasterLanguageFile}.json";
-            string masterSourceFile = Path.Combine(Settings.ExecutionDirectory, masterFileName);
+            string masterSourceFile = masterFileName;   // should be in working directory
             string masterDestinationFile = Path.Combine(Settings.LanguageDirectory, masterFileName);
             if (!Languages.Any(x => x.Info.Name == Settings.MasterLanguageFile) || File.GetLastWriteTimeUtc(masterSourceFile) > File.GetLastWriteTimeUtc(masterDestinationFile))
             {
