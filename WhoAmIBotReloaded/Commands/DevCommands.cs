@@ -47,6 +47,7 @@ namespace WhoAmIBotReloaded.Commands
                     string response = "";
                     using (IDbCommand command = DB.Database.Connection.CreateCommand())
                     {
+                        command.Connection.Open();
                         command.CommandText = fullCommand;
                         command.CommandTimeout = DB.Database.Connection.ConnectionTimeout;
                         using (IDataReader reader = command.ExecuteReader())
