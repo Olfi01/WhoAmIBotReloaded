@@ -9,14 +9,11 @@ using WhoAmIBotReloaded.Helpers;
 
 namespace WhoAmIBotReloaded.Commands
 {
-    public static class DevCommands
+    public class DevCommands : Commands
     {
-#pragma warning disable CS0649  // value will always be null (it won't, because it'll be injected)
-        // will be injected
-        private static Bot Bot;
-#pragma warning restore CS0649
+        internal static new PermissionLevel DefaultPermissionLevel = PermissionLevel.DevOnly;
 
-        [Command("update", PermissionLevel = PermissionLevel.GlobalAdminOnly, Types = CommandTypes.MessageAndCallbackQuery)]
+        [Command("update", Types = CommandTypes.MessageAndCallbackQuery)]
         public static void Update(Update u, string[] args)
         {
             var message = (u.Type == UpdateType.CallbackQuery) ? u.CallbackQuery.Message : Bot.Send(u.Message.Chat.Id, "Updating...");
@@ -29,7 +26,7 @@ namespace WhoAmIBotReloaded.Commands
             // TODO: Wait for all games to end and then set the shutdown handle
         }
 
-        [Command("dontupdate", PermissionLevel = PermissionLevel.DevOnly, Types = CommandTypes.CallbackQuery)]
+        [Command("dontupdate", Types = CommandTypes.CallbackQuery)]
         public static void DontUpdate(Update u, string[] args)
         {
             Bot.Append(u.CallbackQuery.Message, $"\nNo work for me, then! :)");

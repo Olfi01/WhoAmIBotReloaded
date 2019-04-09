@@ -74,7 +74,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\Commands.cs" />
     <Compile Include="Commands\DevCommands.cs" />
+    <Compile Include="Commands\GeneralCommands.cs" />
     <Compile Include="Game.cs">
       <DependentUpon>WhoAmIDB.tt</DependentUpon>
     </Compile>

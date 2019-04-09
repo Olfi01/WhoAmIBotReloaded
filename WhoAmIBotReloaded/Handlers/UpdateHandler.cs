@@ -27,15 +27,19 @@ namespace WhoAmIBotReloaded.Handlers
         private static void Init()
         {
             if (initialized) return;
-            Type[] commandClasses = { typeof(DevCommands) };
+            Type[] commandClasses = { typeof(DevCommands), typeof(GeneralCommands) };
             foreach (var cc in commandClasses)
             {
                 cc.GetField("Bot", BindingFlags.NonPublic | BindingFlags.Static).SetValue(null, Bot);
+                var defaultPermissionLevel = (PermissionLevel)cc.GetField("DefaultPermissionLevel", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                var defaultCommandTypes = (CommandTypes)cc.GetField("DefaultCommandTypes", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
                 foreach (var method in cc.GetMethods())
                 {
                     CommandAttribute commandAttribute = method.GetCustomAttribute<CommandAttribute>();
                     if (commandAttribute != null)
                     {
+                        if (commandAttribute.PermissionLevel == PermissionLevel.Null) commandAttribute.PermissionLevel = defaultPermissionLevel;
+                        if (commandAttribute.Types == CommandTypes.Null) commandAttribute.Types = defaultCommandTypes;
                         commands.Add(commandAttribute, method);
                     }
                 }
@@ -47,42 +51,49 @@ namespace WhoAmIBotReloaded.Handlers
         {
             Init();
 
-            if (e.Update.Type == UpdateType.CallbackQuery)
+            try
             {
-                var exec = commands.Where(
-                    x => x.Key.Types.HasFlag(CommandTypes.CallbackQuery) 
-                    && x.Key.Trigger == e.Update.CallbackQuery.Data);
-                foreach (var command in exec)
+                if (e.Update.Type == UpdateType.CallbackQuery)
                 {
-                    if (CheckPermissions(e.Update.CallbackQuery.From, command.Key.PermissionLevel))
+                    var exec = commands.Where(
+                        x => x.Key.Types.HasFlag(CommandTypes.CallbackQuery)
+                        && x.Key.Trigger == e.Update.CallbackQuery.Data);
+                    foreach (var command in exec)
                     {
-                        command.Value.Invoke(null, new object[] { e.Update, new string[0] });
+                        if (CheckPermissions(e.Update.CallbackQuery.From, command.Key.PermissionLevel))
+                        {
+                            command.Value.Invoke(null, new object[] { e.Update, new string[0] });
+                        }
+                        else
+                        {
+                            Bot.ReplyLocaleToQuery(e.Update.CallbackQuery, "NoPermission");
+                        }
+                        return;
                     }
-                    else
+                }
+                else if (e.Update.Type == UpdateType.Message && e.Update.Message.Type == MessageType.Text)
+                {
+                    var maybeCommand = e.Update.Message.Text.Split(' ').First().ToLower();
+                    if (maybeCommand.EndsWith($"@{Bot.Username.ToLower()}")) maybeCommand = maybeCommand.Substring(0, maybeCommand.Length - 1 - Bot.Username.Length);
+                    var exec = commands.Where(
+                        x => x.Key.Types.HasFlag(CommandTypes.Message)
+                        && CommandAttribute.CommandPrefixes.Any(pref => pref + x.Key.Trigger.ToLower() == maybeCommand));
+                    foreach (var command in exec)
                     {
-                        Bot.ReplyLocaleToQuery(e.Update.CallbackQuery, "NoPermission");
+                        if (CheckPermissions(e.Update.Message.From, command.Key.PermissionLevel, e.Update.Message.Chat))
+                        {
+                            command.Value.Invoke(null, new object[] { e.Update, e.Update.Message.Text.Split(' ') });
+                        }
+                        else
+                        {
+                            Bot.SendLocale(e.Update.Message.Chat, "NoPermission");
+                        }
                     }
-                    return;
                 }
             }
-            else if (e.Update.Type == UpdateType.Message && e.Update.Message.Type == MessageType.Text)
+            catch (Exception ex)
             {
-                var maybeCommand = e.Update.Message.Text.Split(' ').First().ToLower();
-                if (maybeCommand.EndsWith($"@{Bot.Username.ToLower()}")) maybeCommand = maybeCommand.Substring(0, maybeCommand.Length - 1 - Bot.Username.Length);
-                var exec = commands.Where(
-                    x => x.Key.Types.HasFlag(CommandTypes.Message) 
-                    && CommandAttribute.CommandPrefixes.Any(pref => pref + x.Key.Trigger.ToLower() == maybeCommand));
-                foreach (var command in exec)
-                {
-                    if (CheckPermissions(e.Update.Message.From, command.Key.PermissionLevel, e.Update.Message.Chat))
-                    {
-                        command.Value.Invoke(null, new object[] { e.Update, e.Update.Message.Text.Split(' ') });
-                    }
-                    else
-                    {
-                        Bot.SendLocale(e.Update.Message.Chat, "NoPermission");
-                    }
-                }
+                Bot.Api.SendTextMessageAsync(Settings.DevChat, ex.ToString(), disableNotification: true);
             }
         }
 

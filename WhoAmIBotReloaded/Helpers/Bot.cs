@@ -65,25 +65,25 @@ namespace WhoAmIBotReloaded.Helpers
         /// <param name="chat">The chat to send the message to</param>
         /// <param name="localeStringKey">The key used to identify the string in localization</param>
         /// <returns></returns>
-        public Message SendLocale(Chat chat, string localeStringKey) => SendLocale(chat.Id, localeStringKey);
+        public Message SendLocale(Chat chat, string localeStringKey, params string[] values) => SendLocale(chat.Id, localeStringKey, values);
         /// <summary>
         /// Sends a localized string to the chat with the specified id
         /// </summary>
         /// <param name="chatId">The unique identifier of the chat to send the message to</param>
         /// <param name="localeStringKey">The key used to identify the string in localization</param>
         /// <returns></returns>
-        public Message SendLocale(long chatId, string localeStringKey)
+        public Message SendLocale(long chatId, string localeStringKey, params string[] values)
         {
-            var localizedString = GetChatLocaleString(chatId, localeStringKey);
+            var localizedString = GetChatLocaleString(chatId, localeStringKey, values);
             return Send(chatId, localizedString);
         }
 
-        public string GetChatLocaleString(long chatId, string localeStringKey)
+        public string GetChatLocaleString(long chatId, string localeStringKey, params string[] values)
         {
             throw new NotImplementedException();
         }
 
-        public string GetUserLocaleString(int userId, string localeStringKey)
+        public string GetUserLocaleString(int userId, string localeStringKey, params string[] values)
         {
             throw new NotImplementedException();
         }

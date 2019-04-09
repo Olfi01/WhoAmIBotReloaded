@@ -20,11 +20,11 @@ namespace WhoAmIBotReloaded.Helpers
         /// <summary>
         /// From what kind of update to accept this command
         /// </summary>
-        public CommandTypes Types { get; set; } = CommandTypes.Message;
+        public CommandTypes Types { get; set; } = CommandTypes.Null;
         /// <summary>
         /// Required permission level to use this command
         /// </summary>
-        public PermissionLevel PermissionLevel { get; set; } = PermissionLevel.All;
+        public PermissionLevel PermissionLevel { get; set; } = PermissionLevel.Null;
 
         public CommandAttribute(string trigger)
         {
@@ -35,6 +35,7 @@ namespace WhoAmIBotReloaded.Helpers
     [Flags]
     internal enum CommandTypes
     {
+        Null = 0,
         Message = 1,
         CallbackQuery = 2,
         MessageAndCallbackQuery = Message | CallbackQuery,
@@ -42,6 +43,7 @@ namespace WhoAmIBotReloaded.Helpers
 
     internal enum PermissionLevel
     {
+        Null = 0,
         All,
         AdminOnly,
         GlobalAdminOnly,
