@@ -23,7 +23,6 @@ namespace WhoAmIBotReloaded
         public static Bot Bot { get; private set; }
         public static WhoAmIDBContainer DB { get; private set; }
         public static RedisClient Redis { get; private set; }
-        private static Thread UpdateListenerThread;
         public static readonly ManualResetEvent ShutdownHandle = new ManualResetEvent(false);
         static void Main(string[] args)
         {
@@ -50,7 +49,6 @@ namespace WhoAmIBotReloaded
             ListenForUpdates();
 
             ShutdownHandle.WaitOne();
-            UpdateListenerThread.Abort();
 
             // send the cleaner to clean up the execution directory
             ProcessStartInfo psi = new ProcessStartInfo
