@@ -88,5 +88,10 @@ namespace WhoAmIBotReloaded.Helpers
         /// Name of the file to use as a master file, without the file extension
         /// </summary>
         public static readonly string MasterLanguageFile = "English";
+
+        /// <summary>
+        /// Host of redis cache
+        /// </summary>
+        public static readonly string RedisHost = "localhost";
     }
 }

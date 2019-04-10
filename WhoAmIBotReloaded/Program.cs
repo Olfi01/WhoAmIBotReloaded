@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using Newtonsoft.Json;
+using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,6 +22,7 @@ namespace WhoAmIBotReloaded
     {
         public static Bot Bot { get; private set; }
         public static WhoAmIDBContainer DB { get; private set; }
+        public static RedisClient Redis { get; private set; }
         private static Thread UpdateListenerThread;
         public static readonly ManualResetEvent ShutdownHandle = new ManualResetEvent(false);
         static void Main(string[] args)
@@ -36,13 +38,16 @@ namespace WhoAmIBotReloaded
 
             DB = new WhoAmIDBContainer(Settings.DbConnectionString);
 
+            Redis = new RedisClient(Settings.RedisHost);
+
             Bot = new Bot(Settings.BotToken, args.Length < 1);
             Bot.Api.OnUpdate += UpdateHandler.OnUpdate;
             Bot.Start();
             Console.Title = $"WhoAmIBotReloaded - {Bot.Username} ({Bot.Id}) - Version {Assembly.GetExecutingAssembly().GetName().Version}";
 
-            UpdateListenerThread = new Thread(ListenForUpdates);
-            UpdateListenerThread.Start();
+            //UpdateListenerThread = new Thread(ListenForUpdates);
+            //UpdateListenerThread.Start();
+            ListenForUpdates();
 
             ShutdownHandle.WaitOne();
             UpdateListenerThread.Abort();
@@ -69,29 +74,33 @@ namespace WhoAmIBotReloaded
                 HttpListener listener = new HttpListener();
                 listener.Prefixes.Add(Settings.ListenForGitPrefix);
                 listener.Start();
-                while (true)
+                listener.BeginGetContext(RequestReceived, listener);
+            }
+        }
+
+        private static void RequestReceived(IAsyncResult ar)
+        {
+            HttpListener listener = (HttpListener)ar.AsyncState;
+            var context = listener.EndGetContext(ar);
+            using (var sr = new StreamReader(context.Request.InputStream, context.Request.ContentEncoding))
+            {
+                var req = sr.ReadToEnd();
+                dynamic payload = JsonConvert.DeserializeObject(req);
+                if (payload.@ref == $"refs/heads/{Settings.GitBranch}")
                 {
-                    var context = listener.GetContext();
-                    using (var sr = new StreamReader(context.Request.InputStream, context.Request.ContentEncoding))
-                    {
-                        var req = sr.ReadToEnd();
-                        dynamic payload = JsonConvert.DeserializeObject(req);
-                        if (payload.@ref == $"refs/heads/{Settings.GitBranch}")
-                        {
-                            Bot.Api.SendTextMessageAsync(Settings.DevChat,
-                                $"{payload.commits.Count} new commits to <a href=\"{payload.compare}\">{payload.@ref}</a>.\n" +
-                                $"Head commit: <a href=\"{payload.head_commit.url}\">{payload.head_commit.message}</a>\n" +
-                                $"Update?",
-                                replyMarkup: ReplyMarkups.GetUpdateMarkup(), parseMode: ParseMode.Html).Wait();
-                        }
-                    }
-                    using (var sw = new StreamWriter(context.Response.OutputStream))
-                    {
-                        sw.WriteLine("Response");
-                        sw.Flush();
-                    }
+                    Bot.Api.SendTextMessageAsync(Settings.DevChat,
+                        $"{payload.commits.Count} new commits to <a href=\"{payload.compare}\">{payload.@ref}</a>.\n" +
+                        $"Head commit: <a href=\"{payload.head_commit.url}\">{payload.head_commit.message}</a>\n" +
+                        $"Update?",
+                        replyMarkup: ReplyMarkups.GetUpdateMarkup(), parseMode: ParseMode.Html).Wait();
                 }
             }
+            using (var sw = new StreamWriter(context.Response.OutputStream))
+            {
+                sw.WriteLine("Response");
+                sw.Flush();
+            }
+            listener.BeginGetContext(RequestReceived, listener);
         }
 
         public static async Task<bool> UpdateAsync(Message msg)

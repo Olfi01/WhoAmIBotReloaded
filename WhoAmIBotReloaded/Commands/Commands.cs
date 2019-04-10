@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ServiceStack.Redis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,8 @@ namespace WhoAmIBotReloaded.Commands
         protected static Bot Bot;
         // will also be injected
         protected static WhoAmIDBContainer DB;
+        // and this will also be injected
+        protected static RedisClient Redis;
 
         internal static PermissionLevel DefaultPermissionLevel = PermissionLevel.All;
         internal static CommandTypes DefaultCommandTypes = CommandTypes.Message;
