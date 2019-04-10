@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
 using Newtonsoft.Json;
-using ServiceStack.Redis;
+//using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,7 +22,7 @@ namespace WhoAmIBotReloaded
     {
         public static Bot Bot { get; private set; }
         public static WhoAmIDBContainer DB { get; private set; }
-        public static RedisClient Redis { get; private set; }
+        //public static RedisClient Redis { get; private set; }
         public static readonly ManualResetEvent ShutdownHandle = new ManualResetEvent(false);
         static void Main(string[] args)
         {
@@ -37,7 +37,7 @@ namespace WhoAmIBotReloaded
 
             DB = new WhoAmIDBContainer(Settings.DbConnectionString);
 
-            Redis = new RedisClient(Settings.RedisHost);
+            //Redis = new RedisClient(Settings.RedisHost);
 
             Bot = new Bot(Settings.BotToken, args.Length < 1);
             Bot.Api.OnUpdate += UpdateHandler.OnUpdate;
@@ -139,6 +139,9 @@ namespace WhoAmIBotReloaded
                     Arguments = "restore",
                     CreateNoWindow = true
                 };
+                p = new Process { StartInfo = psi };
+                p.Start();
+                p.WaitForExit();
 
                 if (msg != null) Bot.Append(ref msg, "\nBuilding Solution...");
                 // Assumes that devenv is installed and on the PATH
