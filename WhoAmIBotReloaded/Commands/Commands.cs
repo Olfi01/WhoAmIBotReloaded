@@ -1,4 +1,4 @@
-﻿//using ServiceStack.Redis;
+﻿using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace WhoAmIBotReloaded.Commands
         // will also be injected
         protected static WhoAmIDBContainer DB;
         // and this will also be injected
-        //protected static RedisClient Redis;
+        protected static RedisClient Redis;
 
         internal static PermissionLevel DefaultPermissionLevel = PermissionLevel.All;
         internal static CommandTypes DefaultCommandTypes = CommandTypes.Message;

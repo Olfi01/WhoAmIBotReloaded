@@ -11,7 +11,7 @@ using WhoAmIBotReloaded.Commands;
 using WhoAmIBotReloaded.Helpers;
 using TgUser = Telegram.Bot.Types.User;
 using System.Runtime.Caching;
-//using ServiceStack.Redis;
+using ServiceStack.Redis;
 
 namespace WhoAmIBotReloaded.Handlers
 {
@@ -21,7 +21,7 @@ namespace WhoAmIBotReloaded.Handlers
         private static bool initialized = false;
         private static Bot Bot { get => Program.Bot; }
         private static WhoAmIDBContainer DB { get => Program.DB; }
-        //private static RedisClient Redis { get => Program.Redis; }
+        private static RedisClient Redis { get => Program.Redis; }
         private static readonly MemoryCache groupAdminCache = new MemoryCache("WhoAmIAdminCache");
         /// <summary>
         /// Loads all the commands if it hasn't happened yet
@@ -34,7 +34,7 @@ namespace WhoAmIBotReloaded.Handlers
             {
                 cc.GetField("Bot", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).SetValue(null, Bot);
                 cc.GetField("DB", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).SetValue(null, DB);
-                //cc.GetField("Redis", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).SetValue(null, Redis);
+                cc.GetField("Redis", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).SetValue(null, Redis);
                 var defaultPermissionLevel = (PermissionLevel)cc.GetField("DefaultPermissionLevel", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).GetValue(null);
                 var defaultCommandTypes = (CommandTypes)cc.GetField("DefaultCommandTypes", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).GetValue(null);
                 foreach (var method in cc.GetMethods())
