@@ -29,17 +29,29 @@ namespace WhoAmIBotReloaded.Helpers
         /// <summary>
         /// Path of the executable after it has been compiled
         /// </summary>
+#if DEBUG
+        public static readonly string ExecutablePath = Path.Combine(GitDirectory, "WhoAmIBotReloaded\\bin\\Debug\\WhoAmIBotReloaded.exe");
+#else
         public static readonly string ExecutablePath = Path.Combine(GitDirectory, "WhoAmIBotReloaded\\bin\\Release\\WhoAmIBotReloaded.exe");
+#endif
 
         /// <summary>
         /// The path to copy to and execute the program in
         /// </summary>
+#if DEBUG
+        public static readonly string ExecutionDirectory = "C:\\Olfi01\\WhoAmIBotReloadedDebugExec\\";
+#else
         public static readonly string ExecutionDirectory = "C:\\Olfi01\\WhoAmIBotReloadedExec\\";
+#endif
 
         /// <summary>
         /// Path of the cleaner executable
         /// </summary>
+#if DEBUG
+        public static readonly string CleanerPath = Path.Combine(GitDirectory, "Cleaner\\bin\\Debug\\Cleaner.exe");
+#else
         public static readonly string CleanerPath = Path.Combine(GitDirectory, "Cleaner\\bin\\Release\\Cleaner.exe");
+#endif
 
         /// <summary>
         /// Branch to use for updating.
@@ -59,7 +71,7 @@ namespace WhoAmIBotReloaded.Helpers
         /// The port to actively listen for pushes on. If this is null, don't listen at all.
         /// </summary>
 #if DEBUG
-        public static readonly string ListenForGitPrefix = null;
+        public static readonly string ListenForGitPrefix = "http://185.249.197.95:4242/whoAmIGit/";
 #else
         public static readonly string ListenForGitPrefix = "http://185.249.197.95:4242/whoAmIGit/";
 #endif
@@ -84,8 +96,13 @@ namespace WhoAmIBotReloaded.Helpers
         /// </summary>
         public static string DbConnectionString
         {
+#if DEBUG
+            get => (string)RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+                .OpenSubKey("SOFTWARE").OpenSubKey("Crazypokemondev").OpenSubKey("WhoAmI").GetValue("DebugConnectionString");
+#else
             get => (string)RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                 .OpenSubKey("SOFTWARE").OpenSubKey("Crazypokemondev").OpenSubKey("WhoAmI").GetValue("ConnectionString");
+#endif
         }
 
         /// <summary>
