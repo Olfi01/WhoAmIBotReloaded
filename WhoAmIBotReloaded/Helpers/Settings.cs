@@ -44,7 +44,11 @@ namespace WhoAmIBotReloaded.Helpers
         /// <summary>
         /// Branch to use for updating.
         /// </summary>
+#if DEBUG
+        public static readonly string GitBranch = "dev";
+#else
         public static readonly string GitBranch = "master";
+#endif
 
         /// <summary>
         /// Repository to pull from. If this is null, the default upstream repo will be used.
@@ -59,15 +63,20 @@ namespace WhoAmIBotReloaded.Helpers
 #else
         public static readonly string ListenForGitPrefix = "http://185.249.197.95:4242/whoAmIGit/";
 #endif
-        #endregion
+#endregion
 
         /// <summary>
         /// The token of the telegram bot
         /// </summary>
         public static string BotToken
         {
+#if DEBUG
+            get => (string)RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+                .OpenSubKey("SOFTWARE").OpenSubKey("Crazypokemondev").OpenSubKey("WhoAmI").GetValue("DebugAPIToken");
+#else
             get => (string)RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                 .OpenSubKey("SOFTWARE").OpenSubKey("Crazypokemondev").OpenSubKey("WhoAmI").GetValue("APIToken");
+#endif
         }
 
         /// <summary>

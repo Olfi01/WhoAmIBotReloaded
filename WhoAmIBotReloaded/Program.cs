@@ -149,7 +149,11 @@ namespace WhoAmIBotReloaded
                 {
                     WorkingDirectory = Path.GetDirectoryName(Settings.SolutionPath),
                     FileName = "devenv",
+#if DEBUG
+                    Arguments = $"\"{Settings.SolutionPath}\" /Rebuild Debug",
+#else
                     Arguments = $"\"{Settings.SolutionPath}\" /Rebuild Release",
+#endif
                     CreateNoWindow = true
                 };
                 p = new Process { StartInfo = psi };
