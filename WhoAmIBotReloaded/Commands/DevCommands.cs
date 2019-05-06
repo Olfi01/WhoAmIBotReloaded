@@ -93,7 +93,13 @@ namespace WhoAmIBotReloaded.Commands
         public static void RedisCommand(Update u, string[] args)
         {
             if (args.Length < 1) return;
-            var obj = Redis.Get<object>(string.Join(" ", args));
+            var key = string.Join(" ", args);
+            if (!Redis.ContainsKey(key))
+            {
+                Bot.Send(u.Message.Chat.Id, "Not present!");
+                return;
+            }
+            var obj = Redis.Get<object>(key);
             Bot.Send(u.Message.Chat.Id, obj.MakeString(), parseMode: ParseMode.Default);
         }
     }
