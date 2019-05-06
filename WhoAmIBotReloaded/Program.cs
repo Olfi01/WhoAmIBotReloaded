@@ -37,7 +37,7 @@ namespace WhoAmIBotReloaded
 
             DB = new WhoAmIDBContainer(Settings.DbConnectionString);
 
-            Redis = new RedisClient(Settings.RedisHost);
+            Redis = new RedisClient(Settings.RedisHost, Settings.RedisPort, db: Settings.RedisDb);
 
             Bot = new Bot(Settings.BotToken, args.Length < 1);
             Bot.Api.OnUpdate += UpdateHandler.OnUpdate;

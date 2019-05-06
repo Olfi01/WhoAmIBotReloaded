@@ -119,5 +119,19 @@ namespace WhoAmIBotReloaded.Helpers
         /// Host of redis cache
         /// </summary>
         public static readonly string RedisHost = "localhost";
+
+        /// <summary>
+        /// Port of redis cache
+        /// </summary>
+        public static readonly int RedisPort = 6379;
+
+        /// <summary>
+        /// Number of redis db
+        /// </summary>
+#if DEBUG
+        public static readonly int RedisDb = 1;
+#else
+        public static readonly int RedisDb = 0;
+#endif
     }
 }
