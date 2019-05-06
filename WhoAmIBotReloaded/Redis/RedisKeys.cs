@@ -14,7 +14,7 @@ namespace WhoAmIBotReloaded.Redis
 
     public static class RedisLocks
     {
-        public const string Timers = "timers";
-        public const string Games = "games";
+        public const string Timers = "timersLock";
+        public const string Games = "gamesLock";
     }
 }

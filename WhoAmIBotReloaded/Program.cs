@@ -85,9 +85,11 @@ namespace WhoAmIBotReloaded
             {
                 HttpListener listener = new HttpListener();
                 listener.Prefixes.Add(Settings.ListenForGitPrefix);
+                Console.WriteLine($"Listening on prefix {Settings.ListenForGitPrefix}");
                 listener.Start();
                 listener.BeginGetContext(RequestReceived, listener);
             }
+            else Console.WriteLine("No prefix found, not listening for updates.");
         }
 
         private static void RequestReceived(IAsyncResult ar)
