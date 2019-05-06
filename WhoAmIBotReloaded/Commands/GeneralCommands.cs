@@ -40,7 +40,11 @@ namespace WhoAmIBotReloaded.Commands
         [Command("version")]
         public static void Version(Update u, string[] args)
         {
-            Bot.SendLocale(u.Message.Chat, "Version", values: Assembly.GetExecutingAssembly().GetName().Version.ToString());
+#if DEBUG
+            Bot.SendLocale(u.Message.Chat, "Version", values: new string[] { Assembly.GetExecutingAssembly().GetName().Version.ToString(), "Debug" });
+#else
+            Bot.SendLocale(u.Message.Chat, "Version", values: new string[] { Assembly.GetExecutingAssembly().GetName().Version.ToString(), "Release" });
+#endif
         }
     }
 }

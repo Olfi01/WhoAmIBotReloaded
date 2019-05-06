@@ -9,7 +9,7 @@
     "NoPermission": "You don't have permission to use this command!",
     "Ping": "I'm here!",
     "Start": "Hi there! I am WhoAmIBot! Currently I am undergoing maintenance, but if we're lucky I might be back soon!",
-    "Version": "The bot is currently running version {0}.",
+    "Version": "The bot is currently running version {0}, configuration: {1}.",
     "ErrorOccurred": "An error occurred. The devs have been notified.",
     "UseInGroup": "You can only use this command in a group!",
     "AlreadyRunning": "There is already a game running in this group!",
