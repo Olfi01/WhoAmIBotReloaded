@@ -50,6 +50,7 @@ namespace WhoAmIBotReloaded
 
             using (Redis.AcquireLock(RedisLocks.Timers))
             {
+                if (!Redis.ContainsKey(RedisKeys.Timers)) Redis.Set(RedisKeys.Timers, new List<RedisTimer>());
                 var timers = Redis.Get<List<RedisTimer>>(RedisKeys.Timers);
                 foreach (var t in timers)
                 {
