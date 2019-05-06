@@ -34,6 +34,7 @@ namespace WhoAmIBotReloaded.Helpers
 
         public static string MakeString(this object obj)
         {
+            if (obj == null) return "null";
             List<int> test = new List<int>();
             switch (obj)
             {
