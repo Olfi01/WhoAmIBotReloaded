@@ -142,6 +142,9 @@ namespace WhoAmIBotReloaded
                     Arguments = $"checkout {Settings.GitBranch}",
                     CreateNoWindow = true
                 };
+                var p = new Process() { StartInfo = psi };
+                p.Start();
+                p.WaitForExit();
 
                 psi = new ProcessStartInfo
                 {
@@ -150,7 +153,7 @@ namespace WhoAmIBotReloaded
                     Arguments = $"pull {Settings.GitRepository ?? ""} {(Settings.GitRepository == null ? "" : Settings.GitBranch)}",
                     CreateNoWindow = true
                 };
-                var p = new Process { StartInfo = psi };
+                p = new Process { StartInfo = psi };
                 p.Start();
                 p.WaitForExit();
 
