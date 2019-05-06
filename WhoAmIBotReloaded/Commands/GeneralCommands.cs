@@ -25,7 +25,7 @@ namespace WhoAmIBotReloaded.Commands
         [Command("start")]
         public static void Start(Update u, string[] args)
         {
-            if (u.Message.Chat.Type != ChatType.Private) return;
+            if (u.Message.Chat.Type != ChatType.Private || args.Length > 0) return;
             TgUser user = u.Message.From;
             var dbUser = DB.Users.Find(user.Id);
             if (dbUser == null) dbUser = DB.Users.Add(user.CreateDbUser(Bot.GetLanguage(user.LanguageCode)));
@@ -40,7 +40,7 @@ namespace WhoAmIBotReloaded.Commands
         [Command("version")]
         public static void Version(Update u, string[] args)
         {
-            Bot.SendLocale(u.Message.Chat, "Version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            Bot.SendLocale(u.Message.Chat, "Version", values: Assembly.GetExecutingAssembly().GetName().Version.ToString());
         }
     }
 }

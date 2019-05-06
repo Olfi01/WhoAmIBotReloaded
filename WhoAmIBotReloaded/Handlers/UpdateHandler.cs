@@ -97,8 +97,7 @@ namespace WhoAmIBotReloaded.Handlers
             }
             catch (Exception ex)
             {
-                if (ex is TargetInvocationException outerex) ex = outerex.InnerException;
-                Bot.Api.SendTextMessageAsync(Settings.DevChat, ex.ToString(), disableNotification: true).Wait();
+                Bot.LogException(e.Update.Message?.Chat?.Id ?? e.Update.CallbackQuery?.Message?.Chat?.Id ?? 0, ex);
             }
         }
 

@@ -11,6 +11,7 @@ using WhoAmIBotReloaded.Helpers;
 
 namespace WhoAmIBotReloaded.Commands
 {
+#pragma warning disable IDE0060
     public class DevCommands : Commands
     {
         internal static new PermissionLevel DefaultPermissionLevel = PermissionLevel.DevOnly;
@@ -87,5 +88,14 @@ namespace WhoAmIBotReloaded.Commands
                 }
             }
         }
+
+        [Command("redis", Types = CommandTypes.Message)]
+        public static void RedisCommand(Update u, string[] args)
+        {
+            if (args.Length < 1) return;
+            var obj = Redis.Get<object>(string.Join(" ", args));
+            Bot.Send(u.Message.Chat.Id, obj.MakeString(), parseMode: ParseMode.Default);
+        }
     }
+#pragma warning restore IDE0060
 }

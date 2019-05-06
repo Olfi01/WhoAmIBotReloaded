@@ -9,6 +9,15 @@
     "NoPermission": "You don't have permission to use this command!",
     "Ping": "I'm here!",
     "Start": "Hi there! I am WhoAmIBot! Currently I am undergoing maintenance, but if we're lucky I might be back soon!",
-    "Version": "The bot is currently running version {0}."
+    "Version": "The bot is currently running version {0}.",
+    "ErrorOccurred": "An error occurred. The devs have been notified.",
+    "UseInGroup": "You can only use this command in a group!",
+    "AlreadyRunning": "There is already a game running in this group!",
+	"GameStart": "{0} has started a game! Press the button below to join. Or don't. It's your choice, really.",
+	"NoGameRunning": "There is no game running in this group right now. You can start one using /startgame.",
+	"JoinedGame": "You successfully joined the game in {0}!",
+	"PlayerJoined": "{0} has joined the game.",
+	"GameError": "This shouldn't have happened. My master will have much fun figuring out what's wrong... I had to cancel the game.\n{0}",
+	"SecondsLeft": "{0} seconds left until the game starts!"
   }
 }

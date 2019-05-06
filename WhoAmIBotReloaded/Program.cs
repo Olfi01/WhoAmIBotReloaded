@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,8 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using WhoAmIBotReloaded.Handlers;
 using WhoAmIBotReloaded.Helpers;
+using WhoAmIBotReloaded.Redis;
+
 namespace WhoAmIBotReloaded
 {
     public class Program
@@ -24,6 +27,7 @@ namespace WhoAmIBotReloaded
         public static WhoAmIDBContainer DB { get; private set; }
         public static RedisClient Redis { get; private set; }
         public static readonly ManualResetEvent ShutdownHandle = new ManualResetEvent(false);
+        public static readonly Dictionary<Guid, Timer> TimerDict = new Dictionary<Guid, Timer>();
         static void Main(string[] args)
         {
             if (args.Length > 0)
@@ -32,7 +36,7 @@ namespace WhoAmIBotReloaded
                 var eventWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset, waitHandle);
                 eventWaitHandle.Set();
                 // give old program time to shut down
-                Thread.Sleep(1000);
+                // Thread.Sleep(1000);
             }
 
             DB = new WhoAmIDBContainer(Settings.DbConnectionString);
@@ -43,6 +47,15 @@ namespace WhoAmIBotReloaded
             Bot.Api.OnUpdate += UpdateHandler.OnUpdate;
             Bot.Start();
             Console.Title = $"WhoAmIBotReloaded - {Bot.Username} ({Bot.Id}) - Version {Assembly.GetExecutingAssembly().GetName().Version}";
+
+            using (Redis.AcquireLock("timers"))
+            {
+                var timers = Redis.Get<List<RedisTimer>>(RedisKeys.Timers);
+                foreach (var t in timers)
+                {
+                    new Timer(Timers.TimerElapsed, t, (int)Math.Round((t.TimerEnd - DateTimeOffset.Now).TotalMilliseconds), Timeout.Infinite);
+                }
+            }
 
             //UpdateListenerThread = new Thread(ListenForUpdates);
             //UpdateListenerThread.Start();

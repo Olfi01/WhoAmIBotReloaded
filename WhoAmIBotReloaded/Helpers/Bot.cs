@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using File = System.IO.File;
 
 namespace WhoAmIBotReloaded.Helpers
@@ -101,7 +103,7 @@ namespace WhoAmIBotReloaded.Helpers
         /// <param name="localeStringKey">The key used to identify the string in localization</param>
         /// <param name="values">The values to replace {#} with</param>
         /// <returns></returns>
-        public Message SendLocale(Chat chat, string localeStringKey, params string[] values) => SendLocale(chat.Id, localeStringKey, values);
+        public Message SendLocale(Chat chat, string localeStringKey, IReplyMarkup replyMarkup = null, params string[] values) => SendLocale(chat.Id, localeStringKey, replyMarkup: replyMarkup, values);
         /// <summary>
         /// Sends a localized string to the chat with the specified id
         /// </summary>
@@ -109,10 +111,10 @@ namespace WhoAmIBotReloaded.Helpers
         /// <param name="localeStringKey">The key used to identify the string in localization</param>
         /// <param name="values">The values to replace {#} with</param>
         /// <returns></returns>
-        public Message SendLocale(long chatId, string localeStringKey, params string[] values)
+        public Message SendLocale(long chatId, string localeStringKey, IReplyMarkup replyMarkup = null, params string[] values)
         {
             var localizedString = GetChatLocaleString(chatId, localeStringKey, values);
-            return Send(chatId, localizedString);
+            return Send(chatId, localizedString, replyMarkup: replyMarkup);
         }
 
         /// <summary>
@@ -160,9 +162,10 @@ namespace WhoAmIBotReloaded.Helpers
             return (lang ?? DefaultLanguage).Info.Name;
         }
 
-        public Message Send(ChatId chatId, string messageText, ParseMode parseMode = defaultParseMode)
+        public Message Send(ChatId chatId, string messageText, ParseMode parseMode = defaultParseMode, IReplyMarkup replyMarkup = null)
         {
-            return Api.SendTextMessageAsync(chatId, messageText, parseMode: parseMode).Result;
+            if (chatId.Identifier == 0) return null;
+            return Api.SendTextMessageAsync(chatId, messageText, parseMode: parseMode, replyMarkup: replyMarkup).Result;
         }
 
         public void ClearUpdates()
@@ -178,6 +181,13 @@ namespace WhoAmIBotReloaded.Helpers
         public void Stop()
         {
             Api.StopReceiving();
+        }
+
+        public void LogException(long chatId, Exception ex)
+        {
+            if (ex is TargetInvocationException outerex) ex = outerex.InnerException;
+            Api.SendTextMessageAsync(Settings.DevChat, ex.ToString(), disableNotification: true).Wait();
+            SendLocale(chatId, "ErrorOccurred");
         }
     }
 }
