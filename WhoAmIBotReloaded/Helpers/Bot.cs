@@ -103,7 +103,7 @@ namespace WhoAmIBotReloaded.Helpers
         /// <param name="localeStringKey">The key used to identify the string in localization</param>
         /// <param name="values">The values to replace {#} with</param>
         /// <returns></returns>
-        public Message SendLocale(Chat chat, string localeStringKey, IReplyMarkup replyMarkup = null, params string[] values) => SendLocale(chat.Id, localeStringKey, replyMarkup: replyMarkup, values);
+        public Message SendLocale(Chat chat, string localeStringKey, IReplyMarkup replyMarkup = null, params string[] values) => SendLocale(chat.Id, localeStringKey, replyMarkup: replyMarkup, values: values);
         /// <summary>
         /// Sends a localized string to the chat with the specified id
         /// </summary>
