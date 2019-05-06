@@ -139,6 +139,14 @@ namespace WhoAmIBotReloaded
                 {
                     WorkingDirectory = Settings.GitDirectory,
                     FileName = "git",
+                    Arguments = $"checkout {Settings.GitBranch}",
+                    CreateNoWindow = true
+                };
+
+                psi = new ProcessStartInfo
+                {
+                    WorkingDirectory = Settings.GitDirectory,
+                    FileName = "git",
                     Arguments = $"pull {Settings.GitRepository ?? ""} {(Settings.GitRepository == null ? "" : Settings.GitBranch)}",
                     CreateNoWindow = true
                 };
