@@ -41,7 +41,7 @@ namespace WhoAmIBotReloaded
 
             DB = new WhoAmIDBContainer(Settings.DbConnectionString);
 
-            Redis = new RedisClient(Settings.RedisHost);
+            Redis = new RedisClient(Settings.RedisHost, Settings.RedisPort, db: Settings.RedisDb);
 
             Bot = new Bot(Settings.BotToken, args.Length < 1);
             Bot.Api.OnUpdate += UpdateHandler.OnUpdate;
@@ -163,7 +163,11 @@ namespace WhoAmIBotReloaded
                 {
                     WorkingDirectory = Path.GetDirectoryName(Settings.SolutionPath),
                     FileName = "devenv",
+#if DEBUG
+                    Arguments = $"\"{Settings.SolutionPath}\" /Rebuild Debug",
+#else
                     Arguments = $"\"{Settings.SolutionPath}\" /Rebuild Release",
+#endif
                     CreateNoWindow = true
                 };
                 p = new Process { StartInfo = psi };

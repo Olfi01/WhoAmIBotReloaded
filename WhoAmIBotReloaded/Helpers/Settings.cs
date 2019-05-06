@@ -29,22 +29,38 @@ namespace WhoAmIBotReloaded.Helpers
         /// <summary>
         /// Path of the executable after it has been compiled
         /// </summary>
+#if DEBUG
+        public static readonly string ExecutablePath = Path.Combine(GitDirectory, "WhoAmIBotReloaded\\bin\\Debug\\WhoAmIBotReloaded.exe");
+#else
         public static readonly string ExecutablePath = Path.Combine(GitDirectory, "WhoAmIBotReloaded\\bin\\Release\\WhoAmIBotReloaded.exe");
+#endif
 
         /// <summary>
         /// The path to copy to and execute the program in
         /// </summary>
+#if DEBUG
+        public static readonly string ExecutionDirectory = "C:\\Olfi01\\WhoAmIBotReloadedDebugExec\\";
+#else
         public static readonly string ExecutionDirectory = "C:\\Olfi01\\WhoAmIBotReloadedExec\\";
+#endif
 
         /// <summary>
         /// Path of the cleaner executable
         /// </summary>
+#if DEBUG
+        public static readonly string CleanerPath = Path.Combine(GitDirectory, "Cleaner\\bin\\Debug\\Cleaner.exe");
+#else
         public static readonly string CleanerPath = Path.Combine(GitDirectory, "Cleaner\\bin\\Release\\Cleaner.exe");
+#endif
 
         /// <summary>
         /// Branch to use for updating.
         /// </summary>
+#if DEBUG
+        public static readonly string GitBranch = "dev";
+#else
         public static readonly string GitBranch = "master";
+#endif
 
         /// <summary>
         /// Repository to pull from. If this is null, the default upstream repo will be used.
@@ -55,19 +71,24 @@ namespace WhoAmIBotReloaded.Helpers
         /// The port to actively listen for pushes on. If this is null, don't listen at all.
         /// </summary>
 #if DEBUG
-        public static readonly string ListenForGitPrefix = null;
+        public static readonly string ListenForGitPrefix = "http://185.249.197.95:4242/whoAmIGitDebug/";
 #else
         public static readonly string ListenForGitPrefix = "http://185.249.197.95:4242/whoAmIGit/";
 #endif
-        #endregion
+#endregion
 
         /// <summary>
         /// The token of the telegram bot
         /// </summary>
         public static string BotToken
         {
+#if DEBUG
+            get => (string)RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+                .OpenSubKey("SOFTWARE").OpenSubKey("Crazypokemondev").OpenSubKey("WhoAmI").GetValue("DebugAPIToken");
+#else
             get => (string)RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                 .OpenSubKey("SOFTWARE").OpenSubKey("Crazypokemondev").OpenSubKey("WhoAmI").GetValue("APIToken");
+#endif
         }
 
         /// <summary>
@@ -75,8 +96,13 @@ namespace WhoAmIBotReloaded.Helpers
         /// </summary>
         public static string DbConnectionString
         {
+#if DEBUG
+            get => (string)RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+                .OpenSubKey("SOFTWARE").OpenSubKey("Crazypokemondev").OpenSubKey("WhoAmI").GetValue("DebugConnectionString");
+#else
             get => (string)RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                 .OpenSubKey("SOFTWARE").OpenSubKey("Crazypokemondev").OpenSubKey("WhoAmI").GetValue("ConnectionString");
+#endif
         }
 
         /// <summary>
@@ -93,5 +119,19 @@ namespace WhoAmIBotReloaded.Helpers
         /// Host of redis cache
         /// </summary>
         public static readonly string RedisHost = "localhost";
+
+        /// <summary>
+        /// Port of redis cache
+        /// </summary>
+        public static readonly int RedisPort = 6379;
+
+        /// <summary>
+        /// Number of redis db
+        /// </summary>
+#if DEBUG
+        public static readonly int RedisDb = 1;
+#else
+        public static readonly int RedisDb = 0;
+#endif
     }
 }
