@@ -71,7 +71,7 @@ namespace WhoAmIBotReloaded.Helpers
         /// The port to actively listen for pushes on. If this is null, don't listen at all.
         /// </summary>
 #if DEBUG
-        public static readonly string ListenForGitPrefix = "http://185.249.197.95:4242/whoAmIGitDebug/";
+        public static readonly string ListenForGitPrefix = "http://185.249.197.95:4243/whoAmIGitDebug/";
 #else
         public static readonly string ListenForGitPrefix = "http://185.249.197.95:4242/whoAmIGit/";
 #endif
