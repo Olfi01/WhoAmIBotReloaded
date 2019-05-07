@@ -48,5 +48,7 @@ namespace WhoAmIBotReloaded.Helpers
                     return obj.ToString();
             }
         }
+
+        public static RedisPlayer TurnPlayer(this RedisGame game) => game.Players[game.PlayerTurn];
     }
 }
