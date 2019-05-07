@@ -10,15 +10,15 @@ namespace WhoAmIBotReloaded.Redis
 {
     public class RedisGame
     {
-        public long GroupId { get; }
+        public long GroupId { get; set; }
         public string GroupTitle { get; set; }
         public List<RedisPlayer> Players { get; } = new List<RedisPlayer>();
         public int PlayerTurn { get; set; } = 0;
         [IgnoreDataMember]
         public RedisPlayer TurnPlayer { get => Players[PlayerTurn]; }
         public GameState State { get; set; }
-        public string GameId { get; }
-        public List<string> CurrentTimerIds { get; }
+        public string GameId { get; set; }
+        public List<string> CurrentTimerIds { get; } = new List<string>();
 
         public RedisGame(Chat group, string gameId)
         {
