@@ -71,7 +71,14 @@ namespace WhoAmIBotReloaded.Helpers
 #if DEBUG
             Console.WriteLine("Timer elapsed with type {0} and id {1}", timer.Type, timer.TimerId);
 #endif
-            if (!Redis.Get<List<RedisTimer>>(RedisKeys.Timers).Any(x => x.TimerId == timer.TimerId)) return;    // the timer was cancelled
+            if (!Redis.Get<List<RedisTimer>>(RedisKeys.Timers).Any(x => x.TimerId == timer.TimerId))
+            {
+                // the timer was cancelled
+#if DEBUG
+                Console.WriteLine("Timer not found in List, assuming it was cancelled.");
+#endif
+                return;
+            }
             try
             {
                 foreach (var method in typeof(Timers).GetMethods())
