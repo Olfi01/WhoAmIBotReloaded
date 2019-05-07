@@ -68,6 +68,9 @@ namespace WhoAmIBotReloaded.Helpers
                 Console.WriteLine("Incorrectly invoked timer with state {0}", state);
                 return;
             }
+#if DEBUG
+            Console.WriteLine("Timer elapsed with type {0} and id {1}", timer.Type, timer.TimerId);
+#endif
             if (!Redis.Get<List<RedisTimer>>(RedisKeys.Timers).Any(x => x.TimerId == timer.TimerId)) return;    // the timer was cancelled
             try
             {
