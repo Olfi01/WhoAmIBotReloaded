@@ -90,6 +90,10 @@ namespace WhoAmIBotReloaded.Commands
 
             Bot.SendLocale(u.Message.Chat, "JoinedGame", values: game.GroupTitle);
             Bot.SendLocale(game.GroupId, "PlayerJoined", values: u.Message.From.Name());
+
+            Timers.ExtendTimer(game.GameId, TimeSpan.FromSeconds(30));
+            var earliestTimer = Redis.Get<List<RedisTimer>>(RedisKeys.Timers).Where(x => x.GameId == game.GameId).OrderBy(x => x.TimerEnd - DateTimeOffset.Now).First();
+            Timers.AddTimer(new RedisTimer(TimerType.GameStartSoon, earliestTimer.TimerEnd.AddSeconds(-30), game.GameId, game.GroupId) { ExtraValue = earliestTimer.ExtraValue + 30 });
         }
     }
 #pragma warning restore IDE0060

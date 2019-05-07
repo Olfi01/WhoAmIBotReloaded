@@ -26,13 +26,22 @@ namespace WhoAmIBotReloaded.Helpers
             Program.TimerDict.Add(timer.TimerId, new Timer(TimerElapsed, timer, (int)Math.Round((timer.TimerEnd - DateTimeOffset.Now).TotalMilliseconds), Timeout.Infinite));
         }
 
-        public static void RemoveTimer(Guid timerId)
+        public static void RemoveTimer(Guid timerId) => RemoveTimer(Redis.Get<List<RedisTimer>>(RedisKeys.Timers).First(x => x.TimerId == timerId));
+
+        public static void RemoveTimer(RedisTimer timer)
         {
             using (Redis.AcquireLock(RedisLocks.Timers))
             {
                 var timers = Redis.Get<List<RedisTimer>>(RedisKeys.Timers);
-                timers.RemoveAll(x => x.TimerId == timerId);
+                timers.RemoveAll(x => x.TimerId == timer.TimerId);
                 Redis.Set(RedisKeys.Timers, timers);
+            }
+
+            using (Redis.AcquireLock(RedisLocks.Games))
+            {
+                var game = Redis.Get<RedisGame>(timer.GameId);
+                game.CurrentTimerIds.RemoveAll(x => x == timer.TimerId);
+                Redis.Set(timer.GameId, game);
             }
         }
 
@@ -71,7 +80,7 @@ namespace WhoAmIBotReloaded.Helpers
             }
             finally
             {
-                RemoveTimer(timer.TimerId);
+                RemoveTimer(timer);
             }
         }
 
