@@ -29,7 +29,7 @@ namespace WhoAmIBotReloaded.Handlers
         private static void Init()
         {
             if (initialized) return;
-            Type[] commandClasses = { typeof(DevCommands), typeof(GeneralCommands) };
+            Type[] commandClasses = { typeof(DevCommands), typeof(GeneralCommands), typeof(GameCommands) };
             foreach (var cc in commandClasses)
             {
                 cc.GetField("Bot", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy).SetValue(null, Bot);
