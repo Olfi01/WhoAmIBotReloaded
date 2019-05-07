@@ -104,18 +104,15 @@ namespace WhoAmIBotReloaded.Commands
                 Bot.SendLocale(u.Message.Chat, "UseInGroup");
                 return;
             }
-            using (Redis.AcquireLock(RedisLocks.Games))
+            var groupGameIdDict = Redis.Get<Dictionary<long, string>>(RedisKeys.GroupGameIdDict);
+            if (groupGameIdDict == null) groupGameIdDict = new Dictionary<long, string>();
+            if (!groupGameIdDict.ContainsKey(u.Message.Chat.Id))
             {
-                var groupGameIdDict = Redis.Get<Dictionary<long, string>>(RedisKeys.GroupGameIdDict);
-                if (groupGameIdDict == null) groupGameIdDict = new Dictionary<long, string>();
-                if (!groupGameIdDict.ContainsKey(u.Message.Chat.Id))
-                {
-                    Bot.SendLocale(u.Message.Chat, "NoGameRunning");
-                    return;
-                }
-                KillGame(groupGameIdDict[u.Message.Chat.Id]);
-                Bot.SendLocale(u.Message.Chat, "GameKilled");
+                Bot.SendLocale(u.Message.Chat, "NoGameRunning");
+                return;
             }
+            KillGame(groupGameIdDict[u.Message.Chat.Id]);
+            Bot.SendLocale(u.Message.Chat, "GameKilled");
         }
     }
 #pragma warning restore IDE0060

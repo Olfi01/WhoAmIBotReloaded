@@ -62,7 +62,12 @@ namespace WhoAmIBotReloaded.Helpers
 
         public static void TimerElapsed(object state)
         {
-            if (!(state is RedisTimer timer)) return;   // this method wasn't correctly invoked
+            if (!(state is RedisTimer timer))
+            {
+                // this method wasn't correctly invoked
+                Console.WriteLine("Incorrectly invoked timer with state {0}", state);
+                return;
+            }
             if (!Redis.Get<List<RedisTimer>>(RedisKeys.Timers).Any(x => x.TimerId == timer.TimerId)) return;    // the timer was cancelled
             try
             {
