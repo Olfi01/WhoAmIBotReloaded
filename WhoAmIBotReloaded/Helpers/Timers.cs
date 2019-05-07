@@ -26,21 +26,21 @@ namespace WhoAmIBotReloaded.Helpers
             Program.TimerDict.Add(timer.TimerId, new Timer(TimerElapsed, timer, (int)Math.Round((timer.TimerEnd - DateTimeOffset.Now).TotalMilliseconds), Timeout.Infinite));
         }
 
-        public static void RemoveTimer(Guid timerId) => RemoveTimer(Redis.Get<List<RedisTimer>>(RedisKeys.Timers).First(x => x.TimerId == timerId));
+        public static void RemoveTimer(Guid timerId) => RemoveTimer(Redis.Get<List<RedisTimer>>(RedisKeys.Timers).First(x => x.TimerId.Equals(timerId)));
 
         public static void RemoveTimer(RedisTimer timer)
         {
             using (Redis.AcquireLock(RedisLocks.Timers))
             {
                 var timers = Redis.Get<List<RedisTimer>>(RedisKeys.Timers);
-                timers.RemoveAll(x => x.TimerId == timer.TimerId);
+                timers.RemoveAll(x => x.TimerId.Equals(timer.TimerId));
                 Redis.Set(RedisKeys.Timers, timers);
             }
 
             using (Redis.AcquireLock(RedisLocks.Games))
             {
                 var game = Redis.Get<RedisGame>(timer.GameId);
-                game.CurrentTimerIds.RemoveAll(x => x == timer.TimerId);
+                game.CurrentTimerIds.RemoveAll(x => x.Equals(timer.TimerId));
                 Redis.Set(timer.GameId, game);
             }
         }
@@ -53,7 +53,7 @@ namespace WhoAmIBotReloaded.Helpers
                 var timers = Redis.Get<List<RedisTimer>>(RedisKeys.Timers);
                 foreach (var timerId in game.CurrentTimerIds)
                 {
-                    var end = (timers.First(x => x.TimerId == timerId).TimerEnd += extendSpan);
+                    var end = (timers.First(x => x.TimerId.Equals(timerId)).TimerEnd += extendSpan);
                     Program.TimerDict[timerId].Change((int)Math.Round((end - DateTimeOffset.Now).TotalMilliseconds), Timeout.Infinite);
                 }
                 Redis.Set(RedisKeys.Timers, timers);
@@ -72,7 +72,7 @@ namespace WhoAmIBotReloaded.Helpers
             Console.WriteLine("Timer elapsed with type {0} and id {1}", timer.Type, timer.TimerId);
 #endif
             List<RedisTimer> timers = Redis.Get<List<RedisTimer>>(RedisKeys.Timers);
-            if (!timers.Any(x => x.TimerId == timer.TimerId))
+            if (!timers.Any(x => x.TimerId.Equals(timer.TimerId)))
             {
                 // the timer was cancelled
 #if DEBUG
