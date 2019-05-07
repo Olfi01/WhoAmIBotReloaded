@@ -89,11 +89,13 @@ namespace WhoAmIBotReloaded.Helpers
             }
         }
 
+#pragma warning disable IDE0060
         [Elapsed(TimerType.GameStart)]
         public static void GameStartTimerElapsed(RedisTimer timer)
         {
             throw new NotImplementedException();
         }
+#pragma warning restore IDE0060
 
         [Elapsed(TimerType.GameStartSoon)]
         public static void GameStartSoonTimerElapsed(RedisTimer timer)

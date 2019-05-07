@@ -54,6 +54,10 @@ namespace WhoAmIBotReloaded.Commands
                         Bot.SendLocale(u.Message.Chat, "AlreadyRunning");
                         return;
                     }
+                    else
+                    {
+                        groupGameIdDict.Remove(u.Message.Chat.Id);
+                    }
                 }
                 var guid = Guid.NewGuid();
                 game = new RedisGame(u.Message.Chat, guid.ToString());
