@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
@@ -13,6 +14,8 @@ namespace WhoAmIBotReloaded.Redis
         public string GroupTitle { get; set; }
         public List<RedisPlayer> Players { get; } = new List<RedisPlayer>();
         public int PlayerTurn { get; set; } = 0;
+        [IgnoreDataMember]
+        public RedisPlayer TurnPlayer { get => Players[PlayerTurn]; }
         public GameState State { get; set; }
         public string GameId { get; }
         public List<Guid> CurrentTimerIds { get; } = new List<Guid>();
