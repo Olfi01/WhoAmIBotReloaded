@@ -15,9 +15,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 using WhoAmIBotReloaded.Handlers;
 using WhoAmIBotReloaded.Helpers;
 using WhoAmIBotReloaded.Redis;
+using File = System.IO.File;
 
 namespace WhoAmIBotReloaded
 {
@@ -172,20 +174,27 @@ namespace WhoAmIBotReloaded
 
                 if (msg != null) Bot.Append(ref msg, "\nBuilding Solution...");
                 // Assumes that devenv is installed and on the PATH
+                string logTxtPath = Path.Combine(Environment.CurrentDirectory, "buildlog.txt");
                 psi = new ProcessStartInfo
                 {
                     WorkingDirectory = Path.GetDirectoryName(Settings.SolutionPath),
                     FileName = "devenv",
 #if DEBUG
-                    Arguments = $"\"{Settings.SolutionPath}\" /Rebuild Debug",
+                    Arguments = $"\"{Settings.SolutionPath}\" /Rebuild Debug /Out {logTxtPath}",
 #else
-                    Arguments = $"\"{Settings.SolutionPath}\" /Rebuild Release",
+                    Arguments = $"\"{Settings.SolutionPath}\" /Rebuild Release /Out {logTxtPath}",
 #endif
                     CreateNoWindow = true
                 };
                 p = new Process { StartInfo = psi };
                 p.Start();
                 p.WaitForExit();
+                if (p.ExitCode != 0)
+                {
+                    using (var stream = File.OpenRead(logTxtPath)) Bot.Api.SendDocumentAsync(Settings.DevChat, new InputOnlineFile(stream), 
+                        caption: "Something went wrong while building the solution. Here is the build log.");
+                    return false;
+                }
 
                 string fromDir = Path.GetDirectoryName(Settings.ExecutablePath);
                 string newVersion = AssemblyName.GetAssemblyName(Settings.ExecutablePath).Version.ToString();
