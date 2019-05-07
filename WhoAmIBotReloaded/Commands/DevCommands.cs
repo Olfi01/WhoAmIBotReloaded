@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using WhoAmIBotReloaded.Helpers;
+using WhoAmIBotReloaded.Redis;
 
 namespace WhoAmIBotReloaded.Commands
 {
@@ -101,6 +102,14 @@ namespace WhoAmIBotReloaded.Commands
             }
             var obj = Redis.Get<object>(key);
             Bot.Send(u.Message.Chat.Id, obj.MakeString(), parseMode: ParseMode.Default);
+        }
+
+        [Command("clearlocks", Types = CommandTypes.Message)]
+        public static void ClearLocks(Update u, string[] args)
+        {
+            if (Redis.ContainsKey(RedisLocks.Games)) Redis.Remove(RedisLocks.Games);
+            if (Redis.ContainsKey(RedisLocks.Timers)) Redis.Remove(RedisLocks.Timers);
+            Bot.Send(u.Message.Chat, "Cleared!");
         }
     }
 #pragma warning restore IDE0060
