@@ -68,8 +68,8 @@ namespace WhoAmIBotReloaded.Commands
 
             Bot.SendLocale(u.Message.Chat, "GameStart", replyMarkup: ReplyMarkups.GetJoinMarkup(game.GameId, Bot.Username), values: u.Message.From.Name());
 
-            Timers.AddTimer(new RedisTimer(TimerType.GameStartSoon, DateTimeOffset.Now.AddSeconds(60), game.GameId, game.GroupId) { ExtraValue = 60 });
-            Timers.AddTimer(new RedisTimer(TimerType.GameStartSoon, DateTimeOffset.Now.AddSeconds(90), game.GameId, game.GroupId) { ExtraValue = 30 });
+            Timers.AddTimer(new RedisTimer(TimerType.GameStartSoon, DateTimeOffset.Now.AddSeconds(60), game.GameId, game.GroupId, extraValue: 60));
+            Timers.AddTimer(new RedisTimer(TimerType.GameStartSoon, DateTimeOffset.Now.AddSeconds(90), game.GameId, game.GroupId, extraValue: 30));
             Timers.AddTimer(new RedisTimer(TimerType.GameStart, DateTimeOffset.Now.AddSeconds(120), game.GameId, game.GroupId));
         }
 
@@ -97,7 +97,7 @@ namespace WhoAmIBotReloaded.Commands
 
             Timers.ExtendTimer(game.GameId, TimeSpan.FromSeconds(30));
             var earliestTimer = Redis.Get<List<RedisTimer>>(RedisKeys.Timers).Where(x => x.GameId == game.GameId).OrderBy(x => x.TimerEnd - DateTimeOffset.Now).First();
-            Timers.AddTimer(new RedisTimer(TimerType.GameStartSoon, earliestTimer.TimerEnd.AddSeconds(-30), game.GameId, game.GroupId) { ExtraValue = earliestTimer.ExtraValue + 30 });
+            Timers.AddTimer(new RedisTimer(TimerType.GameStartSoon, earliestTimer.TimerEnd.AddSeconds(-30), game.GameId, game.GroupId, extraValue: earliestTimer.ExtraValue + 30));
         }
 
         [Command("killgame", PermissionLevel = PermissionLevel.AdminOnly)]

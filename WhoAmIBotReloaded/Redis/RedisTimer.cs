@@ -12,16 +12,17 @@ namespace WhoAmIBotReloaded.Redis
         public DateTimeOffset TimerEnd { get; set; }
         public string GameId { get; }
         public long ChatId { get; }
-        public Guid TimerId { get; }
-        public int ExtraValue { get; set; } = 0;
+        public string TimerId { get; }
+        public int ExtraValue { get; set; }
 
-        public RedisTimer(TimerType type, DateTimeOffset timerEnd, string gameId, long chatId)
+        public RedisTimer(TimerType type, DateTimeOffset timerEnd, string gameId, long chatId, int extraValue = 0)
         {
             Type = type;
             TimerEnd = timerEnd;
             GameId = gameId;
             ChatId = chatId;
-            TimerId = Guid.NewGuid();
+            TimerId = Guid.NewGuid().ToString();
+            ExtraValue = extraValue;
         }
     }
 

@@ -29,7 +29,7 @@ namespace WhoAmIBotReloaded
         public static WhoAmIDBContainer DB { get; private set; }
         public static RedisClient Redis { get; private set; }
         public static readonly ManualResetEvent ShutdownHandle = new ManualResetEvent(false);
-        public static readonly Dictionary<Guid, Timer> TimerDict = new Dictionary<Guid, Timer>();
+        public static readonly Dictionary<string, Timer> TimerDict = new Dictionary<string, Timer>();
         static void Main(string[] args)
         {
             if (args.Length > 0)
