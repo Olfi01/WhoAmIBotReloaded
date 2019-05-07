@@ -32,18 +32,20 @@ namespace WhoAmIBotReloaded.Helpers
 
         public static string Name(this TgUser user, bool withLink = true) => withLink ? $"<a href=\"tg://user?id={user.Id}\">{Name(user, false)}</a>" : string.Join(" ", user.FirstName, user.LastName);
 
-        public static string MakeString(this object obj)
+        public static string MakeString(this object obj, bool toplevel = true)
         {
             if (obj == null) return "null";
             List<int> test = new List<int>();
+            string type = "";
+            if (toplevel) type = $"({obj.GetType().Name}): ";
             switch (obj)
             {
                 case string s:
-                    return s;
+                    return $"{type}{s}";
                 case IEnumerable<object> enumerable:
-                    return "{" + string.Join("\n", enumerable.Select(x => x.MakeString())) + "}";
+                    return $"{type}{{" + string.Join("\n", enumerable.Select(x => x.MakeString(false))) + "}";
                 case KeyValuePair<object, object> kvp:
-                    return $"{{ {kvp.Key.MakeString()}: {kvp.Value.MakeString()}}}";
+                    return $"{type}{{ {kvp.Key.MakeString(false)}: {kvp.Value.MakeString(false)}}}";
                 default:
                     return obj.ToString();
             }
