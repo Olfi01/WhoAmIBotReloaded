@@ -86,6 +86,8 @@ namespace WhoAmIBotReloaded
         {
             if (Settings.ListenForGitPrefix != null)
             {
+                // give old program time to shut down
+                Thread.Sleep(5000);
                 HttpListener listener = new HttpListener();
                 listener.Prefixes.Add(Settings.ListenForGitPrefix);
                 Console.WriteLine($"Listening on prefix {Settings.ListenForGitPrefix}");

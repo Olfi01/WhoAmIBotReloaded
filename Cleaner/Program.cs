@@ -10,7 +10,7 @@ namespace Cleaner
         {
             if (args.Length < 1) throw new ArgumentNullException("directory");
             // give the program time to exit
-            Thread.Sleep(1000);
+            Thread.Sleep(5000);
             string path = args[0];
             if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
                 DeleteRecursively(Directory.CreateDirectory(path));
