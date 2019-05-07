@@ -95,6 +95,28 @@ namespace WhoAmIBotReloaded.Commands
             var earliestTimer = Redis.Get<List<RedisTimer>>(RedisKeys.Timers).Where(x => x.GameId == game.GameId).OrderBy(x => x.TimerEnd - DateTimeOffset.Now).First();
             Timers.AddTimer(new RedisTimer(TimerType.GameStartSoon, earliestTimer.TimerEnd.AddSeconds(-30), game.GameId, game.GroupId) { ExtraValue = earliestTimer.ExtraValue + 30 });
         }
+
+        [Command("killgame", PermissionLevel = PermissionLevel.AdminOnly)]
+        public static void KillGame(Update u, string[] args)
+        {
+            if (u.Message.Chat.Type != ChatType.Group && u.Message.Chat.Type != ChatType.Supergroup)
+            {
+                Bot.SendLocale(u.Message.Chat, "UseInGroup");
+                return;
+            }
+            using (Redis.AcquireLock(RedisLocks.Games))
+            {
+                var groupGameIdDict = Redis.Get<Dictionary<long, string>>(RedisKeys.GroupGameIdDict);
+                if (groupGameIdDict == null) groupGameIdDict = new Dictionary<long, string>();
+                if (!groupGameIdDict.ContainsKey(u.Message.Chat.Id))
+                {
+                    Bot.SendLocale(u.Message.Chat, "NoGameRunning");
+                    return;
+                }
+                KillGame(groupGameIdDict[u.Message.Chat.Id]);
+                Bot.SendLocale(u.Message.Chat, "GameKilled");
+            }
+        }
     }
 #pragma warning restore IDE0060
 }

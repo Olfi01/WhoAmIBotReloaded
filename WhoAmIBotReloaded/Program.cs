@@ -50,13 +50,14 @@ namespace WhoAmIBotReloaded
             Bot.Start();
             Console.Title = $"WhoAmIBotReloaded - {Bot.Username} ({Bot.Id}) - Version {Assembly.GetExecutingAssembly().GetName().Version}";
 
-            using (Redis.AcquireLock(RedisLocks.Timers))
+            using (Redis.AcquireLock(RedisLocks.Timers, TimeSpan.FromSeconds(5)))
             {
                 if (!Redis.ContainsKey(RedisKeys.Timers)) Redis.Set(RedisKeys.Timers, new List<RedisTimer>());
                 var timers = Redis.Get<List<RedisTimer>>(RedisKeys.Timers);
                 foreach (var t in timers)
                 {
-                    new Timer(Timers.TimerElapsed, t, (int)Math.Round((t.TimerEnd - DateTimeOffset.Now).TotalMilliseconds), Timeout.Infinite);
+                    int dueTime = (int)Math.Round((t.TimerEnd - DateTimeOffset.Now).TotalMilliseconds);
+                    if (dueTime > 0) new Timer(Timers.TimerElapsed, t, dueTime, Timeout.Infinite);
                 }
             }
 
