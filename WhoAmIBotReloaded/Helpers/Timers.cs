@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,6 +31,7 @@ namespace WhoAmIBotReloaded.Helpers
 
         public static void RemoveTimer(RedisTimer timer)
         {
+            if (timer == null) return;
             using (Redis.AcquireLock(RedisLocks.Timers))
             {
                 var timers = Redis.Get<List<RedisTimer>>(RedisKeys.Timers);
@@ -90,6 +92,7 @@ namespace WhoAmIBotReloaded.Helpers
             }
             catch (Exception ex)
             {
+                if (ex is TargetInvocationException tie) ex = tie.InnerException;
                 Program.Bot.LogException(timer.ChatId, ex);
                 Program.Bot.SendLocale(timer.ChatId, "GameError", values: ex.Message);
                 GameCommands.KillGame(timer.GameId);

@@ -18,7 +18,7 @@ namespace WhoAmIBotReloaded.Redis
         public RedisPlayer TurnPlayer { get => Players[PlayerTurn]; }
         public GameState State { get; set; }
         public string GameId { get; set; }
-        public List<string> CurrentTimerIds { get; set; }
+        public List<string> CurrentTimerIds { get; set; } = new List<string>();
 
         public RedisGame(Chat group, string gameId)
         {
@@ -26,7 +26,6 @@ namespace WhoAmIBotReloaded.Redis
             GroupTitle = group.Title;
             State = GameState.Starting;
             GameId = gameId;
-            CurrentTimerIds = new List<string>();
         }
     }
 
