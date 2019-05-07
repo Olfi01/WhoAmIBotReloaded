@@ -20,7 +20,7 @@ namespace WhoAmIBotReloaded.Commands
         public static void KillGame(string gameId)
         {
             var game = Redis.Get<RedisGame>(gameId);
-            if (game.CurrentTimerIds.Any())
+            if (game.CurrentTimerIds.Count > 0)
             {
                 foreach (var id in game.CurrentTimerIds) Timers.RemoveTimer(id);
             }
