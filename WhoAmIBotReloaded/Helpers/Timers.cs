@@ -71,7 +71,8 @@ namespace WhoAmIBotReloaded.Helpers
 #if DEBUG
             Console.WriteLine("Timer elapsed with type {0} and id {1}", timer.Type, timer.TimerId);
 #endif
-            if (!Redis.Get<List<RedisTimer>>(RedisKeys.Timers).Any(x => x.TimerId == timer.TimerId))
+            List<RedisTimer> timers = Redis.Get<List<RedisTimer>>(RedisKeys.Timers);
+            if (!timers.Any(x => x.TimerId == timer.TimerId))
             {
                 // the timer was cancelled
 #if DEBUG
