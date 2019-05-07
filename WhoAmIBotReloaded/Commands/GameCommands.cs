@@ -68,9 +68,9 @@ namespace WhoAmIBotReloaded.Commands
 
             Bot.SendLocale(u.Message.Chat, "GameStart", replyMarkup: ReplyMarkups.GetJoinMarkup(game.GameId, Bot.Username), values: u.Message.From.Name());
 
-            Timers.AddTimer(new RedisTimer(TimerType.GameStart, DateTimeOffset.Now.AddSeconds(120), game.GameId, game.GroupId));
             Timers.AddTimer(new RedisTimer(TimerType.GameStartSoon, DateTimeOffset.Now.AddSeconds(60), game.GameId, game.GroupId) { ExtraValue = 60 });
             Timers.AddTimer(new RedisTimer(TimerType.GameStartSoon, DateTimeOffset.Now.AddSeconds(90), game.GameId, game.GroupId) { ExtraValue = 30 });
+            Timers.AddTimer(new RedisTimer(TimerType.GameStart, DateTimeOffset.Now.AddSeconds(120), game.GameId, game.GroupId));
         }
 
         [Command("start")]
