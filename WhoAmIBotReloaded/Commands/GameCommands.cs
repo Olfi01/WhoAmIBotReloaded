@@ -105,8 +105,7 @@ namespace WhoAmIBotReloaded.Commands
                 return;
             }
             var groupGameIdDict = Redis.Get<Dictionary<long, string>>(RedisKeys.GroupGameIdDict);
-            if (groupGameIdDict == null) groupGameIdDict = new Dictionary<long, string>();
-            if (!groupGameIdDict.ContainsKey(u.Message.Chat.Id))
+            if (groupGameIdDict == null || !groupGameIdDict.ContainsKey(u.Message.Chat.Id))
             {
                 Bot.SendLocale(u.Message.Chat, "NoGameRunning");
                 return;
