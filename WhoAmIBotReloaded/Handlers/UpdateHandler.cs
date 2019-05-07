@@ -17,7 +17,7 @@ namespace WhoAmIBotReloaded.Handlers
 {
     public static class UpdateHandler
     {
-        private static readonly Dictionary<CommandAttribute, MethodInfo> commands = new Dictionary<CommandAttribute, MethodInfo>();
+        private static readonly List<Tuple<CommandAttribute, MethodInfo>> commands = new List<Tuple<CommandAttribute, MethodInfo>>();
         private static bool initialized = false;
         private static Bot Bot { get => Program.Bot; }
         private static WhoAmIDBContainer DB { get => Program.DB; }
@@ -44,7 +44,7 @@ namespace WhoAmIBotReloaded.Handlers
                     {
                         if (commandAttribute.PermissionLevel == PermissionLevel.Null) commandAttribute.PermissionLevel = defaultPermissionLevel;
                         if (commandAttribute.Types == CommandTypes.Null) commandAttribute.Types = defaultCommandTypes;
-                        commands.Add(commandAttribute, method);
+                        commands.Add(new Tuple<CommandAttribute, MethodInfo>(commandAttribute, method));
                     }
                 }
             }
@@ -60,13 +60,13 @@ namespace WhoAmIBotReloaded.Handlers
                 if (e.Update.Type == UpdateType.CallbackQuery)
                 {
                     var exec = commands.Where(
-                        x => x.Key.Types.HasFlag(CommandTypes.CallbackQuery)
-                        && x.Key.Trigger == e.Update.CallbackQuery.Data);
+                        x => x.Item1.Types.HasFlag(CommandTypes.CallbackQuery)
+                        && x.Item1.Trigger == e.Update.CallbackQuery.Data);
                     foreach (var command in exec)
                     {
-                        if (CheckPermissions(e.Update.CallbackQuery.From, command.Key.PermissionLevel))
+                        if (CheckPermissions(e.Update.CallbackQuery.From, command.Item1.PermissionLevel))
                         {
-                            command.Value.Invoke(null, new object[] { e.Update, e.Update.CallbackQuery.Data.Split(' ') });
+                            command.Item2.Invoke(null, new object[] { e.Update, e.Update.CallbackQuery.Data.Split(' ') });
                         }
                         else
                         {
@@ -80,13 +80,13 @@ namespace WhoAmIBotReloaded.Handlers
                     var maybeCommand = e.Update.Message.Text.Split(' ').First().ToLower();
                     if (maybeCommand.EndsWith($"@{Bot.Username.ToLower()}")) maybeCommand = maybeCommand.Substring(0, maybeCommand.Length - 1 - Bot.Username.Length);
                     var exec = commands.Where(
-                        x => x.Key.Types.HasFlag(CommandTypes.Message)
-                        && CommandAttribute.CommandPrefixes.Any(pref => pref + x.Key.Trigger.ToLower() == maybeCommand));
+                        x => x.Item1.Types.HasFlag(CommandTypes.Message)
+                        && CommandAttribute.CommandPrefixes.Any(pref => pref + x.Item1.Trigger.ToLower() == maybeCommand));
                     foreach (var command in exec)
                     {
-                        if (CheckPermissions(e.Update.Message.From, command.Key.PermissionLevel, e.Update.Message.Chat))
+                        if (CheckPermissions(e.Update.Message.From, command.Item1.PermissionLevel, e.Update.Message.Chat))
                         {
-                            command.Value.Invoke(null, new object[] { e.Update, e.Update.Message.Text.Split(' ').Skip(1).ToArray() });
+                            command.Item2.Invoke(null, new object[] { e.Update, e.Update.Message.Text.Split(' ').Skip(1).ToArray() });
                         }
                         else
                         {
