@@ -111,6 +111,13 @@ namespace WhoAmIBotReloaded.Commands
             if (Redis.ContainsKey(RedisLocks.Timers)) Redis.Remove(RedisLocks.Timers);
             Bot.Send(u.Message.Chat, "Cleared!");
         }
+
+        [Command("cleartimers", Types = CommandTypes.Message)]
+        public static void ClearTimers(Update u, string[] args)
+        {
+            using (Redis.AcquireLock(RedisLocks.Timers)) Redis.Set(RedisKeys.Timers, new List<RedisTimer>());
+            Bot.Send(u.Message.Chat, "Cleared!");
+        }
     }
 #pragma warning restore IDE0060
 }
