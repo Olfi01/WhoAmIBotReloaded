@@ -78,19 +78,16 @@ namespace WhoAmIBotReloaded.Commands
         {
             if (args.Length < 1 || (u.Message.Chat.Type != ChatType.Group && u.Message.Chat.Type != ChatType.Supergroup)) return;
             RedisGame game;
-            using (Redis.AcquireLock(RedisLocks.Games))
+            string gameid = args[0];
+            if ((game = Redis.Get<RedisGame>(gameid)) == null)
             {
-                var groupGameIdDict = Redis.Get<Dictionary<long, string>>(RedisKeys.GroupGameIdDict);
-                if (groupGameIdDict == null) return;
-                if (!groupGameIdDict.ContainsKey(u.Message.Chat.Id) || (game = Redis.Get<RedisGame>(groupGameIdDict[u.Message.Chat.Id])) == null)
-                {
-                    // no game running in this chat
-                    Bot.SendLocale(u.Message.Chat, "NoGameRunning");
-                    return;
-                }
-                game.Players.Add(new RedisPlayer(u.Message.From));
-                Redis.Set(groupGameIdDict[u.Message.Chat.Id], game);
+                // no game running in this chat
+                Bot.SendLocale(u.Message.Chat, "NoGameRunning");
+                return;
             }
+            game.Players = game.Players ?? new List<RedisPlayer>();
+            game.Players.Add(new RedisPlayer(u.Message.From));
+            Redis.Set(gameid, game);
 
             Bot.SendLocale(u.Message.Chat, "JoinedGame", values: game.GroupTitle);
             Bot.SendLocale(game.GroupId, "PlayerJoined", values: u.Message.From.Name());
