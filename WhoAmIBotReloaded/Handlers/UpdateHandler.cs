@@ -86,6 +86,9 @@ namespace WhoAmIBotReloaded.Handlers
                     {
                         if (CheckPermissions(e.Update.Message.From, command.Item1.PermissionLevel, e.Update.Message.Chat))
                         {
+#if DEBUG
+                            Console.WriteLine($"Executing command {command.Item1.Trigger}");
+#endif
                             command.Item2.Invoke(null, new object[] { e.Update, e.Update.Message.Text.Split(' ').Skip(1).ToArray() });
                         }
                         else
