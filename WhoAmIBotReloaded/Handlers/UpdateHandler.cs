@@ -72,8 +72,8 @@ namespace WhoAmIBotReloaded.Handlers
                         {
                             Bot.ReplyLocaleToQuery(e.Update.CallbackQuery, "NoPermission");
                         }
-                        return;
                     }
+                    return;
                 }
                 else if (e.Update.Type == UpdateType.Message && e.Update.Message.Type == MessageType.Text)
                 {
