@@ -24,6 +24,9 @@ namespace WhoAmIBotReloaded.Helpers
                 timers.Add(timer);
                 Redis.Set(RedisKeys.Timers, timers);
             }
+            var game = Redis.Get<RedisGame>(timer.GameId);
+            game.CurrentTimerIds.Add(timer.TimerId);
+            Redis.Set(timer.GameId, game);
             Program.TimerDict.Add(timer.TimerId, new Timer(TimerElapsed, timer, (int)Math.Round((timer.TimerEnd - DateTimeOffset.Now).TotalMilliseconds), Timeout.Infinite));
         }
 

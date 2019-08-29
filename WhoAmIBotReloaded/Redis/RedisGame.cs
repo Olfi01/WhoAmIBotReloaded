@@ -18,7 +18,7 @@ namespace WhoAmIBotReloaded.Redis
         public RedisPlayer TurnPlayer { get => Players[PlayerTurn]; }
         public GameState State { get; set; }
         public string GameId { get; set; }
-        public List<string> CurrentTimerIds { get; set; } = new List<string>();
+        public List<string> CurrentTimerIds { get; } = new List<string>();
 
         public RedisGame(Chat group, string gameId)
         {
