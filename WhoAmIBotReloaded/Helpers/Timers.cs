@@ -46,8 +46,11 @@ namespace WhoAmIBotReloaded.Helpers
             using (Redis.AcquireLock(RedisLocks.Games))
             {
                 var game = Redis.Get<RedisGame>(timer.GameId);
-                if (game.CurrentTimerIds != null) game.CurrentTimerIds.RemoveAll(x => x == timer.TimerId);
-                Redis.Set(timer.GameId, game);
+                if (game != null && game.CurrentTimerIds != null)
+                {
+                    game.CurrentTimerIds.RemoveAll(x => x == timer.TimerId);
+                    Redis.Set(timer.GameId, game);
+                }
             }
         }
 

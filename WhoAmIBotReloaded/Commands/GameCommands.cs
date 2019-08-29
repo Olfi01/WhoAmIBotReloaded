@@ -77,6 +77,7 @@ namespace WhoAmIBotReloaded.Commands
         public static void Join(Update u, string[] args)
         {
             if (args.Length < 1 || (u.Message.Chat.Type != ChatType.Group && u.Message.Chat.Type != ChatType.Supergroup)) return;
+            Console.WriteLine("I have been called");
             RedisGame game;
             string gameid = args[0];
             if ((game = Redis.Get<RedisGame>(gameid)) == null)
