@@ -86,6 +86,11 @@ namespace WhoAmIBotReloaded.Commands
                 return;
             }
             game.Players = game.Players ?? new List<RedisPlayer>();
+            if (game.Players.Any(x => x.User.Id == u.Message.From.Id))
+            {
+                Bot.SendLocale(u.Message.Chat, "AlreadyInThisGame");
+                return;
+            }
             game.Players.Add(new RedisPlayer(u.Message.From));
             Redis.Set(gameid, game);
 

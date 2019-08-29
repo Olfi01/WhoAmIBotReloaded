@@ -19,6 +19,7 @@
 	"PlayerJoined": "{0} has joined the game.",
 	"GameError": "This shouldn't have happened. My master will have much fun figuring out what's wrong... I had to cancel the game.\n{0}",
 	"SecondsLeft": "{0} seconds left until the game starts!",
-	"GameKilled": "The game was killed."
+  "GameKilled": "The game was killed.",
+  "AlreadyInThisGame": "You are already in this game!"
   }
 }
