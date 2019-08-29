@@ -12,13 +12,13 @@ namespace WhoAmIBotReloaded.Redis
     {
         public long GroupId { get; set; }
         public string GroupTitle { get; set; }
-        public List<RedisPlayer> Players { get; set; } = new List<RedisPlayer>();
+        public List<RedisPlayer> Players { get; set; }
         public int PlayerTurn { get; set; } = 0;
         [IgnoreDataMember]
         public RedisPlayer TurnPlayer { get => Players[PlayerTurn]; }
         public GameState State { get; set; }
         public string GameId { get; set; }
-        public List<string> CurrentTimerIds { get; }
+        public List<string> CurrentTimerIds { get; set; }
 
         public RedisGame(Chat group, string gameId)
         {
@@ -27,6 +27,7 @@ namespace WhoAmIBotReloaded.Redis
             State = GameState.Starting;
             GameId = gameId;
             CurrentTimerIds = new List<string>();
+            Players = new List<RedisPlayer>();
         }
     }
 
